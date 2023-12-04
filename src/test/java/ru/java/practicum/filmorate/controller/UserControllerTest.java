@@ -3,12 +3,9 @@ package ru.java.practicum.filmorate.controller;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.java.practicum.filmorate.exception.ValidationException;
 import ru.java.practicum.filmorate.model.User;
-
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 class UserControllerTest {
 

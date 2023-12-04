@@ -2,7 +2,6 @@ package ru.java.practicum.filmorate.controller;
 
 import ru.java.practicum.filmorate.exception.ValidationException;
 import ru.java.practicum.filmorate.model.BaseUnit;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
