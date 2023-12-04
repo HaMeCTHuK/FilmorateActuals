@@ -20,7 +20,7 @@ public class UserController extends BaseController<User> {
     }
 
     @PostMapping
-    public User createUser(@RequestBody @Valid User user){
+    public User createUser(@RequestBody @Valid User user) {
 
 
 
@@ -29,7 +29,7 @@ public class UserController extends BaseController<User> {
     }
 
     @PutMapping
-    public User updateUser(@RequestBody @Valid User user){
+    public User updateUser(@RequestBody @Valid User user) {
 
         log.info("Пытаемся обновить пользователя : {}", user);
         return super.update(user);
