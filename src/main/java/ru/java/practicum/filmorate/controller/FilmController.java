@@ -17,7 +17,8 @@ import java.util.List;
 @Slf4j
 public class FilmController extends BaseController<Film> {
 
-    private final static LocalDate LAST_RELEASE_DATE = LocalDate.of(1895, 12, 28);
+    private static final  LocalDate LAST_RELEASE_DATE = LocalDate.of(1895, 12, 28);
+
     @Override
     public void validate(Film film) {
 
