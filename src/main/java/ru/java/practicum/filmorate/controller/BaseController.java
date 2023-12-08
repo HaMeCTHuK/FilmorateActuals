@@ -12,6 +12,7 @@ public abstract class BaseController<T extends BaseUnit> {
     private int generateId;
 
     public T create(T data) {
+
         validate(data);
         data.setId(++generateId);
         storage.put(data.getId(), data);
@@ -21,13 +22,11 @@ public abstract class BaseController<T extends BaseUnit> {
     public T update(T data) {
 
         validate(data);
-        if (storage.containsKey(data.getId())) {
-            storage.put(data.getId(), data);
-        } else {
+        if (!storage.containsKey(data.getId())) {
             throw new ValidationException("Обновление не выполнено, id отсутствует в хранилище");
         }
 
-
+        storage.put(data.getId(), data);
         return data;
     }
 
