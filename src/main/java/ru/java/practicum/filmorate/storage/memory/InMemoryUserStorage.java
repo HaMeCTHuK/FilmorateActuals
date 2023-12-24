@@ -8,7 +8,9 @@ import ru.java.practicum.filmorate.storage.UserStorage;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j @Component public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements UserStorage {
+@Slf4j
+@Component
+public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements UserStorage {
 
     @Override
     public List<User> getAllFriends(Long userId) {
