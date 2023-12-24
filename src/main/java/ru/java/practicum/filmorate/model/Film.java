@@ -5,8 +5,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import javax.validation.constraints.*;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
 
 
 @Data
@@ -22,8 +27,11 @@ public class Film extends BaseUnit {
     private String description;
     @NotNull
     private LocalDate releaseDate;
-    //@PositiveOrZero (message = "Не может быть <= 0")  (оставил специально для себя)
     @Min(value = 1, message = "Не может быть <= 0")
     private int duration;
+    HashSet<Long> likes = new HashSet<>(); //для лайков
 
+    public int getLikesCount() {
+        return likes.size();
+    }
 }

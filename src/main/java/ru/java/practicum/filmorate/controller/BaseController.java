@@ -1,3 +1,4 @@
+/*
 package ru.java.practicum.filmorate.controller;
 
 import ru.java.practicum.filmorate.exception.ValidationException;
@@ -8,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class BaseController<T extends BaseUnit> {
-    private final Map<Integer, T> storage = new HashMap<>();
-    private int generateId;
+    private final Map<Long, T> storage = new HashMap<>();
+    private long generateId;
 
     public T create(T data) {
 
@@ -37,3 +38,4 @@ public abstract class BaseController<T extends BaseUnit> {
 
     public abstract void validate(T data);
 }
+*/
