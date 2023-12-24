@@ -5,6 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.java.practicum.filmorate.exception.ValidationException;
 import ru.java.practicum.filmorate.model.Film;
+import ru.java.practicum.filmorate.service.FilmService;
+import ru.java.practicum.filmorate.storage.memory.InMemoryFilmStorage;
+import ru.java.practicum.filmorate.storage.memory.InMemoryUserStorage;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -15,14 +18,15 @@ import java.time.LocalDate;
 
 class FilmControllerTest {
 
-    FilmController filmController;
+    FilmService filmService;
+
     private final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = validatorFactory.getValidator();
 
     @BeforeEach
     void setUp() {
 
-        filmController = new FilmController();
+        filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
 
     }
 
@@ -37,8 +41,7 @@ class FilmControllerTest {
                 .build();
 
 
-
-        Assertions.assertThrows(ValidationException.class, () -> filmController.validate(film));
+        Assertions.assertThrows(ValidationException.class, () -> filmService.validate(film));
     }
 
     @Test
@@ -51,7 +54,7 @@ class FilmControllerTest {
                 .releaseDate(LocalDate.of(1991,11,12))
                 .build();
 
-        Assertions.assertDoesNotThrow(() -> filmController.validate(film));
+        Assertions.assertDoesNotThrow(() -> validator.validate(film));
     }
 
     @Test

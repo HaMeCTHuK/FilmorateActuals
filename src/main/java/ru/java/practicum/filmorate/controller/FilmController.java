@@ -1,51 +1,69 @@
 package ru.java.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.java.practicum.filmorate.exception.ValidationException;
 import ru.java.practicum.filmorate.model.Film;
-
-
+import ru.java.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
-public class FilmController extends BaseController<Film> {
+@RequiredArgsConstructor
+public class FilmController {
 
-    private static final  LocalDate LAST_RELEASE_DATE = LocalDate.of(1895, 12, 28);
-
-    @Override
-    public void validate(Film film) {
-
-        if (film.getReleaseDate().isBefore(LAST_RELEASE_DATE)) {
-            log.warn("Дата выпуска меньше 1895.12.28 : {}", film.getReleaseDate());
-            throw new ValidationException("Дата выпуска меньше 1895.12.28");
-        }
-    }
+    private final FilmService filmService;
 
     @PostMapping
     public Film createFilm(@RequestBody @Valid Film film) {
-
-
         log.info("Пытаемся добавить фильм : {}", film);
-        return super.create(film);
+        return filmService.create(film);
     }
 
-    @PutMapping() //"/{id}"
+    @PutMapping()
     public Film updateFilm(@RequestBody @Valid Film film) {
-
         log.info("Пытаемся обновить фильм : {}", film);
-        return super.update(film);
+        return filmService.update(film);
     }
 
     @GetMapping
     public List<Film> getAllFilms() {
-
-        log.info("Текущее количество фильмов: {}", super.getData().size());
-        return super.getData();
+        log.info("Текущее количество фильмов: {}", filmService.getAll().size());
+        return filmService.getAll();
     }
+
+    @GetMapping("/{id}")
+    public Film getFilm(@RequestBody @PathVariable Long id) {
+        log.info("Получаем объект по id: {}", id);
+        return filmService.getData(id);
+    }
+
+    //PUT /films/{id}/like/{userId} — пользователь ставит лайк фильму.
+
+    @PutMapping("/{id}/like/{userId}")
+    public boolean likeFilm(@RequestBody @PathVariable Long id, @PathVariable Long userId) {
+        log.info("Пользователь с id: {} пытается поставить лайк фильму с айди {}", id, userId);
+        return filmService.addLike(id, userId);
+    }
+
+    //DELETE /films/{id}/like/{userId} — пользователь удаляет лайк.
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public boolean removeFilmLike(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Пользователь с id: {} пытается удалить лайк у фильма с айди {}", id, userId);
+        return filmService.deleteLike(id, userId);
+    }
+
+    //GET /films/popular?count={count} — возвращает список из первых count фильмов по количеству лайков.
+    // Если значение параметра count не задано, верните первые 10.
+
+    @GetMapping("/popular")
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        log.info("Пытаемся получить самые залайканые фильмы количеством: {} шт.", count);
+        return filmService.getPopularFilms(count);
+    }
+
 }

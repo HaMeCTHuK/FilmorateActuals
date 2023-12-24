@@ -10,5 +10,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder    //аннотация которая позволяет создавать классы билдер для классов наследников
 @NoArgsConstructor
 public abstract class BaseUnit {
-    private int id;
+    private long id;
 }
