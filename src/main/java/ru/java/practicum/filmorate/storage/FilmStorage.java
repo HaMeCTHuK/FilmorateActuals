@@ -8,9 +8,9 @@ public interface FilmStorage extends AbstractStorage<Film> {
 
     List<Long> getAllFilmLikes(Long userId);
 
-    boolean addLike(Long filmId, Long UserId);
+    boolean addLike(Long filmId, Long userId);
 
-    boolean deleteLike(Long filmId, Long UserId);
+    boolean deleteLike(Long filmId, Long userId);
 
     List<Film> getPopularFilms(int count);
 }
