@@ -5,9 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import ru.java.practicum.filmorate.model.BaseUnit;
 import ru.java.practicum.filmorate.storage.AbstractStorage;
 
-import java.util.ArrayList;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -34,8 +33,8 @@ public abstract class InMemoryBaseStorage<T extends BaseUnit> implements Abstrac
     }
 
     @Override
-    public List<T> getAll() {
-        return new ArrayList<>(storage.values());
+    public HashMap<Long, T> getAll() {
+        return new HashMap<>(storage);
     }
 
     @Override
@@ -43,8 +42,4 @@ public abstract class InMemoryBaseStorage<T extends BaseUnit> implements Abstrac
         return storage.get(id);
     }
 
-    @Override
-    public void deleteData(T data) {
-        storage.remove(data.getId(), data);
-    }
 }

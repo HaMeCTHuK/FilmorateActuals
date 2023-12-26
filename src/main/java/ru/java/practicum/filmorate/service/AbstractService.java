@@ -6,7 +6,7 @@ import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.model.BaseUnit;
 import ru.java.practicum.filmorate.storage.memory.InMemoryBaseStorage;
 
-import java.util.List;
+import java.util.HashMap;
 
 @Slf4j
 public abstract class AbstractService<T extends BaseUnit> {
@@ -27,19 +27,19 @@ public abstract class AbstractService<T extends BaseUnit> {
 
     public T update(T data) {
         validate(data);
-        if (!getAll().contains(getData(data.getId()))) {
+        if (getAll().get(data.getId()) == null) {
             log.info("Данные пользователя не найдены");
             throw new DataNotFoundException("Данные пользователя не найдены");
         }
         return inMemoryBaseStorage.update(data);
     }
 
-    public List<T> getAll() {
+    public HashMap<Long, T> getAll() {
         return inMemoryBaseStorage.getAll();
     }
 
     public T getData(Long id) {
-        if (!getAll().contains(inMemoryBaseStorage.get(id))) {
+        if (getAll().get(id) == null) {
             log.info("Данные пользователя не найдены");
             throw new DataNotFoundException("Данные пользователя не найдены");
         }

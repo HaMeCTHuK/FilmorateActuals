@@ -1,13 +1,10 @@
 package ru.java.practicum.filmorate.storage.memory;
 
 import org.springframework.stereotype.Component;
-import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.storage.FilmStorage;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -15,9 +12,6 @@ public class InMemoryFilmStorage extends InMemoryBaseStorage<Film> implements Fi
 
     @Override
     public List<Long> getAllFilmLikes(Long filmId) {
-        if (!getAll().contains(get(filmId))) {
-            throw new DataNotFoundException("Список не выведен, таких фильмов с айди нет" + filmId);
-        }
         Film film = get(filmId);
         return new ArrayList<>(film.getLikes());
     }
@@ -25,24 +19,18 @@ public class InMemoryFilmStorage extends InMemoryBaseStorage<Film> implements Fi
     @Override
     public boolean addLike(Long filmId, Long userId) {
         Film film = get(filmId);
-        return film.getLikes().add(userId);
+        return  film.addNewLike(userId);
     }
 
     @Override
     public boolean deleteLike(Long filmId, Long userId) {
         Film film = get(filmId);
-        boolean isRemoved = film.getLikes().remove(userId);
-
-        if (!isRemoved) {
-            throw new DataNotFoundException("Лайк не удален, таких данных в списке лайков нет");
-        }
-
-        return isRemoved;
+        return film.deleteLike(userId);
     }
 
     @Override
     public List<Film> getPopularFilms(int count) {
-        List<Film> allFilms = getAll();
+        Collection<Film> allFilms = getAll().values();
         List<Film> filmsWithMostLikes = allFilms
                 .stream()
                 .sorted(Comparator.comparingInt(Film::getLikesCount).reversed())

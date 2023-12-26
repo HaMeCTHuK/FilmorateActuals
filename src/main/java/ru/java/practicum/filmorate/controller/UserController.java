@@ -8,6 +8,7 @@ import ru.java.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.PositiveOrZero;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -21,9 +22,10 @@ public class UserController {
 
     @GetMapping
     @ResponseBody
-    public List<User> getAllUsers() {
+    public Collection<User> getAllUsers() {
         log.info("Текущее количество пользователей: {}", userService.getAll().size());
-        return userService.getAll();
+        //return userService.getAll();
+        return  userService.getAll().values();
     }
 
     @PostMapping
@@ -46,14 +48,14 @@ public class UserController {
 
     // PUT /users/{id}/friends/{friendId} — добавление в друзья.
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriends(@RequestBody @PositiveOrZero @PathVariable Long id, @PathVariable Long friendId) {
+    public boolean addFriends(@RequestBody @PositiveOrZero @PathVariable Long id, @PathVariable Long friendId) {
         log.info("Добавляем пользователю ID: " + id + ", друга с friendId: " + friendId);
         return userService.addFriend(id, friendId);
     }
 
     // DELETE /users/{id}/friends/{friendId} — удаление из друзей.
     @DeleteMapping("/{id}/friends/{friendId}")
-    public User removeFriend(@RequestBody @PositiveOrZero @PathVariable Long id, @PathVariable Long friendId) {
+    public boolean removeFriend(@RequestBody @PositiveOrZero @PathVariable Long id, @PathVariable Long friendId) {
         log.info("Удаляем у пользователя ID: " + id + " друга с friendId: " + friendId);
         return userService.deleteFriend(id, friendId);
     }

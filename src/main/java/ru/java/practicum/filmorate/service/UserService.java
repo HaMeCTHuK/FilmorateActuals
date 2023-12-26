@@ -23,7 +23,6 @@ public class UserService extends AbstractService<User> {
 
     @Override
     public void validate(User user) {
-
         if (user.getName() == null || user.getName().isBlank()) {
             log.info("имя для отображения пустое — используем использован логин : {}", user.getLogin());
             user.setName(user.getLogin());
@@ -35,9 +34,7 @@ public class UserService extends AbstractService<User> {
     public void validateParameter(Long userId) {
         if (userId == null) {
             throw new IncorrectParameterException("Некорректные параметры поля, проверь null");
-        }
-
-        if (!getAll().contains(getData(userId))) {
+        } else if (getAll().get(userId) == null) {
             throw new DataNotFoundException("Такого пользователя с айди нет" + userId);
         }
 
@@ -46,11 +43,7 @@ public class UserService extends AbstractService<User> {
     @Override
     public void validateParameters(Long userId, Long friendId) {
         log.info("Валидация параметров UserService");
-        if (userId == null || friendId == null) {
-            throw new IncorrectParameterException("Некорректные параметры полей, проверь null");
-        }
-
-        if (!getAll().contains(getData(userId)) || !getAll().contains(getData(friendId))) {
+        if (getAll().get(userId) == null || getAll().get(friendId) == null) {
             throw new DataNotFoundException("Друг не добавлен, таких пользователей нет");
         }
 
@@ -62,24 +55,21 @@ public class UserService extends AbstractService<User> {
         return inMemoryUserStorage.getAllFriends(userId);
     }
 
-    public User addFriend(Long userId, Long friendId) {
+    public boolean addFriend(Long userId, Long friendId) {
         validateParameters(userId, friendId);
         log.info("Добавляем пользователю ID: " + userId + ", друга с friendId: " + friendId);
         return inMemoryUserStorage.addFriend(userId, friendId);
-
     }
 
-    public User deleteFriend(Long userId, Long friendId) {
+    public boolean deleteFriend(Long userId, Long friendId) {
         validateParameters(userId, friendId);
         log.info("Удаляем у пользователя ID: " + userId + " друга с friendId: " + friendId);
         return inMemoryUserStorage.deleteFriend(userId, friendId);
-
     }
 
     public List<User> getCommonFriends(Long userId, Long friendId) {
         validateParameters(userId, friendId);
         log.info("Получаем список общих друзей пользоватеей ID: " + userId + " и " + friendId);
         return inMemoryUserStorage.getCommonFriends(userId, friendId);
-
     }
 }

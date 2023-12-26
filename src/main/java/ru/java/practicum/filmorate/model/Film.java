@@ -34,4 +34,12 @@ public class Film extends BaseUnit {
     public int getLikesCount() {
         return likes.size();
     }
+
+    public boolean addNewLike(Long userId) {
+       return likes.add(userId);
+    }
+
+    public boolean deleteLike(Long userId) {
+        return likes.remove(userId);
+    }
 }
