@@ -7,6 +7,7 @@ import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -30,9 +31,10 @@ public class FilmController {
     }
 
     @GetMapping
-    public List<Film> getAllFilms() {
+    public Collection<Film> getAllFilms() {
         log.info("Текущее количество фильмов: {}", filmService.getAll().size());
-        return filmService.getAll();
+        //return filmService.getAll();
+        return filmService.getAll().values();
     }
 
     @GetMapping("/{id}")

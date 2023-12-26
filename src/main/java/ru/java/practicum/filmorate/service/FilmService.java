@@ -30,7 +30,6 @@ public class FilmService extends AbstractService<Film> {
 
     @Override
     public void validate(Film film) {
-
         if (film.getReleaseDate().isBefore(LAST_RELEASE_DATE)) {
             log.warn("Дата выпуска меньше 1895.12.28 : {}", film.getReleaseDate());
             throw new ValidationException("Дата выпуска меньше 1895.12.28");
@@ -41,6 +40,8 @@ public class FilmService extends AbstractService<Film> {
     public void validateParameter(Long filmId) {
         if (filmId == null) {
             throw new IncorrectParameterException("Некорректные параметры поля, проверь null");
+        } else if (inMemoryFilmStorage.get(filmId) == null) {
+            throw new DataNotFoundException("Пользователей с айди нет" + filmId);
         }
     }
 
@@ -50,13 +51,8 @@ public class FilmService extends AbstractService<Film> {
         Film film = inMemoryFilmStorage.get(filmId);
         if (film == null || user == null) {
             log.info("Ошибка валидации. Проверь null");
+            log.info("Ошибка валидации. Такого айди пользователя: {} или фильма {} нет", userId, filmId);
             throw new IncorrectParameterException("Некорректные параметры полей, проверь null");
-        }
-
-        if (!inMemoryUserStorage.getAll().contains(user) || !inMemoryFilmStorage.getAll().contains(film)) {
-            log.info("Ошибка валидации. Пользователей с айди нет" + userId);
-            throw new DataNotFoundException("Пользователей с айди нет" + userId);
-
         }
     }
 

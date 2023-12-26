@@ -2,7 +2,7 @@ package ru.java.practicum.filmorate.storage;
 
 import ru.java.practicum.filmorate.model.BaseUnit;
 
-import java.util.List;
+import java.util.HashMap;
 
 public interface AbstractStorage<T extends BaseUnit> {
 
@@ -10,9 +10,8 @@ public interface AbstractStorage<T extends BaseUnit> {
 
     T update(T data);
 
-    List<T> getAll();
+    HashMap<Long, T> getAll();
 
     T get(long id);
 
-    void deleteData(T data);
 }

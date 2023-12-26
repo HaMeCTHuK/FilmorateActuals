@@ -8,7 +8,7 @@ public interface UserStorage extends AbstractStorage<User> {
 
     List<User> getAllFriends(Long userId);
 
-    User addFriend(Long userId, Long friendId);
+    boolean addFriend(Long userId, Long friendId);
 
-    User deleteFriend(Long userId, Long friendId);
+    boolean deleteFriend(Long userId, Long friendId);
 }

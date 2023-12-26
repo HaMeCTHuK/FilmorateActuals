@@ -27,4 +27,12 @@ public class User extends BaseUnit {
     @PastOrPresent(message = "не может быть в будущем")
     private LocalDate birthday;
     private HashSet<Long> friends = new HashSet<>(); // для другов
+
+    public boolean addFriend(Long userId) {
+        return friends.add(userId);
+    }
+
+    public boolean deleteFriend(Long userId) {
+        return friends.remove(userId);
+    }
 }

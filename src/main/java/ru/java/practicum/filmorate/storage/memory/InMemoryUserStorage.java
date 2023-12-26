@@ -25,25 +25,23 @@ public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements Us
     }
 
     @Override
-    public User addFriend(Long userId, Long friendId) {
+    public boolean addFriend(Long userId, Long friendId) {
         User user = get(userId);
         User friend = get(friendId);
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
+        boolean isAdded = (user.addFriend(friendId) && friend.addFriend(userId));
         log.info("Друг добавлен");
         log.info("Друг: " + get(friendId));
-        return user;
+        return isAdded;
 
     }
 
     @Override
-    public User deleteFriend(Long userId, Long friendId) {
+    public boolean deleteFriend(Long userId, Long friendId) {
         User user = get(userId);
         User friend = get(friendId);
+        boolean isDeleted = (user.deleteFriend(friendId) && friend.deleteFriend(userId));
         log.info("Друг удален");
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(userId);
-        return user;
+        return isDeleted;
 
     }
 
@@ -62,5 +60,4 @@ public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements Us
         return commonFriendsList;
 
     }
-
 }
