@@ -40,7 +40,7 @@ public class FilmService extends AbstractService<Film> {
     public void validateParameter(Long filmId) {
         if (filmId == null) {
             throw new IncorrectParameterException("Некорректные параметры поля, проверь null");
-        } else if (inMemoryFilmStorage.get(filmId) == null) {
+        } else if (getData(filmId) == null) {
             throw new DataNotFoundException("Пользователей с айди нет" + filmId);
         }
     }
@@ -48,7 +48,7 @@ public class FilmService extends AbstractService<Film> {
     @Override
     public void validateParameters(Long filmId, Long userId) {
         User user = inMemoryUserStorage.get(userId);
-        Film film = inMemoryFilmStorage.get(filmId);
+        Film film = getData(filmId);
         if (film == null || user == null) {
             log.info("Ошибка валидации. Проверь null");
             log.info("Ошибка валидации. Такого айди пользователя: {} или фильма {} нет", userId, filmId);

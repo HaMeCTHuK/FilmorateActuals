@@ -32,9 +32,10 @@ public class UserService extends AbstractService<User> {
 
     @Override
     public void validateParameter(Long userId) {
+        User user = getData(userId);
         if (userId == null) {
             throw new IncorrectParameterException("Некорректные параметры поля, проверь null");
-        } else if (getAll().get(userId) == null) {
+        } else if (user == null) {
             throw new DataNotFoundException("Такого пользователя с айди нет" + userId);
         }
 
@@ -42,8 +43,10 @@ public class UserService extends AbstractService<User> {
 
     @Override
     public void validateParameters(Long userId, Long friendId) {
+        User user = getData(userId);
+        User friend = getData(friendId);
         log.info("Валидация параметров UserService");
-        if (getAll().get(userId) == null || getAll().get(friendId) == null) {
+        if (user == null || friend == null) {
             throw new DataNotFoundException("Друг не добавлен, таких пользователей нет");
         }
 

@@ -6,8 +6,7 @@ import ru.java.practicum.filmorate.model.BaseUnit;
 import ru.java.practicum.filmorate.storage.AbstractStorage;
 
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public abstract class InMemoryBaseStorage<T extends BaseUnit> implements AbstractStorage<T> {
@@ -33,12 +32,12 @@ public abstract class InMemoryBaseStorage<T extends BaseUnit> implements Abstrac
     }
 
     @Override
-    public HashMap<Long, T> getAll() {
-        return new HashMap<>(storage);
+    public List<Long> getAll() {
+        return new ArrayList<>(storage.keySet());
     }
 
     @Override
-    public T get(long id) {
+    public T get(Long id) {
         return storage.get(id);
     }
 

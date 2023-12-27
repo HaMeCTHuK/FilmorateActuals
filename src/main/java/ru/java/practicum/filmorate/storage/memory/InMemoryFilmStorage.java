@@ -13,7 +13,7 @@ public class InMemoryFilmStorage extends InMemoryBaseStorage<Film> implements Fi
     @Override
     public List<Long> getAllFilmLikes(Long filmId) {
         Film film = get(filmId);
-        return new ArrayList<>(film.getLikes());
+        return new ArrayList<>(film.getClassSet());
     }
 
     @Override
@@ -30,7 +30,10 @@ public class InMemoryFilmStorage extends InMemoryBaseStorage<Film> implements Fi
 
     @Override
     public List<Film> getPopularFilms(int count) {
-        Collection<Film> allFilms = getAll().values();
+        Collection<Film> allFilms = new ArrayList<>();
+        for (Long filmId : getAll()) {
+            allFilms.add(get(filmId));
+        }
         List<Film> filmsWithMostLikes = allFilms
                 .stream()
                 .sorted(Comparator.comparingInt(Film::getLikesCount).reversed())
