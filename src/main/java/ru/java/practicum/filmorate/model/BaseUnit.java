@@ -13,6 +13,6 @@ import java.util.HashSet;
 @NoArgsConstructor
 public abstract class BaseUnit {
     private long id;
-    public abstract HashSet<Long> getClassSet();
 
+    public abstract HashSet<Long> getClassSet();
 }
