@@ -1,9 +1,7 @@
 package ru.java.practicum.filmorate.model;
 
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.Min;
@@ -29,7 +27,9 @@ public class Film extends BaseUnit {
     private LocalDate releaseDate;
     @Min(value = 1, message = "Не может быть <= 0")
     private int duration;
-    HashSet<Long> likes = new HashSet<>(); //для лайков
+    @Getter(AccessLevel.PROTECTED)
+    @Setter(AccessLevel.PROTECTED)
+    private HashSet<Long> likes = new HashSet<>(); //для лайков
 
     public int getLikesCount() {
         return likes.size();
@@ -42,4 +42,10 @@ public class Film extends BaseUnit {
     public boolean deleteLike(Long userId) {
         return likes.remove(userId);
     }
+
+    @Override
+    public HashSet<Long> getClassSet() {
+        return new HashSet<>(getLikes());
+    }
+
 }

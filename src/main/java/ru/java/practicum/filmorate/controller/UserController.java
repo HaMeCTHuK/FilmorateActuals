@@ -22,10 +22,9 @@ public class UserController {
 
     @GetMapping
     @ResponseBody
-    public Collection<User> getAllUsers() {
+    public List<User> getAllUsers() {
         log.info("Текущее количество пользователей: {}", userService.getAll().size());
-        //return userService.getAll();
-        return  userService.getAll().values();
+        return  userService.getAll();
     }
 
     @PostMapping

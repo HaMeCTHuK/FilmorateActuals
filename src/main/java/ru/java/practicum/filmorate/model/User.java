@@ -1,8 +1,6 @@
 package ru.java.practicum.filmorate.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.Email;
@@ -26,6 +24,8 @@ public class User extends BaseUnit {
     private String name;
     @PastOrPresent(message = "не может быть в будущем")
     private LocalDate birthday;
+    @Getter(AccessLevel.PROTECTED)
+    @Setter(AccessLevel.PROTECTED)
     private HashSet<Long> friends = new HashSet<>(); // для другов
 
     public boolean addFriend(Long userId) {
@@ -35,4 +35,9 @@ public class User extends BaseUnit {
     public boolean deleteFriend(Long userId) {
         return friends.remove(userId);
     }
+    @Override
+    public HashSet<Long> getClassSet() {
+        return new HashSet<>(getFriends());
+    }
+
 }
