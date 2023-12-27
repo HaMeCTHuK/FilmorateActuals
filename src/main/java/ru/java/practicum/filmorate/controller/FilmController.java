@@ -7,7 +7,6 @@ import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
 
 @RestController
