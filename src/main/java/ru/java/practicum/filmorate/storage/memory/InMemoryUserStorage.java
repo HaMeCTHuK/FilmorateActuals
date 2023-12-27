@@ -32,7 +32,6 @@ public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements Us
         log.info("Друг добавлен");
         log.info("Друг: " + get(friendId));
         return isAdded;
-
     }
 
     @Override
@@ -42,7 +41,6 @@ public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements Us
         boolean isDeleted = (user.deleteFriend(friendId) && friend.deleteFriend(userId));
         log.info("Друг удален");
         return isDeleted;
-
     }
 
     public List<User> getCommonFriends(Long userId, Long friendId) {
@@ -58,6 +56,5 @@ public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements Us
         log.info("Получен список общих друзей: " + commonFriendsList.size());
         log.info("Список общих друзей: " + commonFriendsList);
         return commonFriendsList;
-
     }
 }

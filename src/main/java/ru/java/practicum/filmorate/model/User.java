@@ -35,6 +35,7 @@ public class User extends BaseUnit {
     public boolean deleteFriend(Long userId) {
         return friends.remove(userId);
     }
+
     @Override
     public HashSet<Long> getClassSet() {
         return new HashSet<>(getFriends());
