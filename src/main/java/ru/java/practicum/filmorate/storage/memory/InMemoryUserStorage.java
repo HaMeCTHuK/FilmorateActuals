@@ -15,10 +15,11 @@ public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements Us
     @Override
     public List<User> getAllFriends(Long userId) {
         User user = get(userId);
-        log.info("Список друзей получен {} ", user.getClassSet().size());
-        log.info("Список друзей: " + user.getClassSet());
+        ArrayList<Long> friensIds = new ArrayList<>(user.getFriends());
+        log.info("Список друзей получен {} ", friensIds.size());
+        log.info("Список друзей: " + friensIds);
         ArrayList<User> allFriends = new ArrayList<>();
-        for (Long friendId : user.getClassSet()) {
+        for (Long friendId : friensIds) {
             allFriends.add(get(friendId));
         }
         return allFriends;
@@ -48,8 +49,8 @@ public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements Us
         User friend = get(friendId);
 
         List<User> commonFriendsList = new ArrayList<>();
-        for (Long commonFriendId : user.getClassSet()) {
-            if (friend.getClassSet().contains(commonFriendId)) {
+        for (Long commonFriendId : user.getFriends()) {
+            if (friend.getFriends().contains(commonFriendId)) {
                 commonFriendsList.add(get(commonFriendId));
             }
         }

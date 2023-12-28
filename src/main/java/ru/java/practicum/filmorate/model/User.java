@@ -24,8 +24,6 @@ public class User extends BaseUnit {
     private String name;
     @PastOrPresent(message = "не может быть в будущем")
     private LocalDate birthday;
-    @Getter(AccessLevel.PROTECTED)
-    @Setter(AccessLevel.PROTECTED)
     private HashSet<Long> friends = new HashSet<>(); // для другов
 
     public boolean addFriend(Long userId) {
@@ -36,9 +34,8 @@ public class User extends BaseUnit {
         return friends.remove(userId);
     }
 
-    @Override
-    public HashSet<Long> getClassSet() {
-        return new HashSet<>(getFriends());
+    public HashSet<Long> getFriends() {
+        return new HashSet<>(friends);
     }
 
 }

@@ -32,10 +32,10 @@ public class UserService extends AbstractService<User> {
 
     @Override
     public void validateParameter(Long userId) {
-        User user = getData(userId);
         if (userId == null) {
             throw new IncorrectParameterException("Некорректные параметры поля, проверь null");
-        } else if (user == null) {
+        }
+        if (getData(userId) == null) {
             throw new DataNotFoundException("Такого пользователя с айди нет" + userId);
         }
 

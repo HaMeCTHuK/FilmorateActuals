@@ -32,8 +32,8 @@ public abstract class InMemoryBaseStorage<T extends BaseUnit> implements Abstrac
     }
 
     @Override
-    public List<Long> getAll() {
-        return new ArrayList<>(storage.keySet());
+    public List<T> getAll() {
+        return new ArrayList<>(storage.values());
     }
 
     @Override

@@ -9,7 +9,7 @@ public interface AbstractStorage<T extends BaseUnit> {
 
     T update(T data);
 
-    List<Long> getAll();
+    List<T> getAll();
 
     T get(Long id);
 

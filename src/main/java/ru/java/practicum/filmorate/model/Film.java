@@ -27,8 +27,6 @@ public class Film extends BaseUnit {
     private LocalDate releaseDate;
     @Min(value = 1, message = "Не может быть <= 0")
     private int duration;
-    @Getter(AccessLevel.PROTECTED)
-    @Setter(AccessLevel.PROTECTED)
     private HashSet<Long> likes = new HashSet<>(); //для лайков
 
     public int getLikesCount() {
@@ -43,9 +41,8 @@ public class Film extends BaseUnit {
         return likes.remove(userId);
     }
 
-    @Override
-    public HashSet<Long> getClassSet() {
-        return new HashSet<>(getLikes());
+    public HashSet<Long> getLikes() {
+        return new HashSet<>(likes);
     }
 
 }
