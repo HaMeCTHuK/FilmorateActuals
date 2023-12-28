@@ -31,8 +31,9 @@ public class FilmController {
 
     @GetMapping
     public List<Film> getAllFilms() {
-        log.info("Текущее количество фильмов: {}", filmService.getAll().size());
-        return filmService.getAll();
+        List<Film> allFilms = filmService.getAll();
+        log.info("Текущее количество фильмов: {}", allFilms.size());
+        return allFilms;
     }
 
     @GetMapping("/{id}")

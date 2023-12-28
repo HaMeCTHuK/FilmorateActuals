@@ -35,11 +35,7 @@ public abstract class AbstractService<T extends BaseUnit> {
     }
 
     public List<T> getAll() {
-        List<T> allData = new ArrayList<>();
-       for (Long id : inMemoryBaseStorage.getAll())  {
-           allData.add(getData(id));
-       }
-       return allData;
+       return inMemoryBaseStorage.getAll();
     }
 
     public T getData(Long id) {

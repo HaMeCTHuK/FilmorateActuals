@@ -40,8 +40,9 @@ public class FilmService extends AbstractService<Film> {
     public void validateParameter(Long filmId) {
         if (filmId == null) {
             throw new IncorrectParameterException("Некорректные параметры поля, проверь null");
-        } else if (getData(filmId) == null) {
-            throw new DataNotFoundException("Пользователей с айди нет" + filmId);
+        }
+        if (getData(filmId) == null) {
+            throw new DataNotFoundException("Фильма с айди нет" + filmId);
         }
     }
 

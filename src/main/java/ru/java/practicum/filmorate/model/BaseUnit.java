@@ -14,5 +14,4 @@ import java.util.HashSet;
 public abstract class BaseUnit {
     private long id;
 
-    public abstract HashSet<Long> getClassSet();
 }
