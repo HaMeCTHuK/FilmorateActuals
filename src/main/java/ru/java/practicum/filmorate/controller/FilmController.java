@@ -66,5 +66,4 @@ public class FilmController {
         log.info("Пытаемся получить самые залайканые фильмы количеством: {} шт.", count);
         return filmService.getPopularFilms(count);
     }
-
 }
