@@ -1,6 +1,6 @@
 # java-filmorate
 Template repository for Filmorate project.
-![click](C:\Users\OMEN\dev\controllers-films-users\DBScheme.png)
+![click](DBScheme.png)<br />
 Примеры запросов :
 
 1) **SELECT * FROM Film;** <br />
