@@ -10,6 +10,7 @@ import java.util.List;
 
 @Slf4j
 @Component
+@Deprecated
 public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements UserStorage {
 
     @Override
@@ -58,4 +59,5 @@ public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements Us
         log.info("Список общих друзей: " + commonFriendsList);
         return commonFriendsList;
     }
+
 }

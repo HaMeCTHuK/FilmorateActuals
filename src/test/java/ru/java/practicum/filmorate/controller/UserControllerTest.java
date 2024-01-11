@@ -22,8 +22,8 @@ class UserControllerTest {
 
 
     @BeforeEach
-    void setUp() {
-        userService = new UserService(new InMemoryUserStorage());
+             void setUp() {
+       // userService = new UserService(new InMemoryUserStorage());   старая логика
     }
 
     @Test

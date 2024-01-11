@@ -28,6 +28,8 @@ public class Film extends BaseUnit {
     @Min(value = 1, message = "Не может быть <= 0")
     private int duration;
     private HashSet<Long> likes = new HashSet<>(); //для лайков
+    @NotNull
+    private Mpa mpa;
 
     public int getLikesCount() {
         return likes.size();

@@ -8,6 +8,8 @@ import ru.java.practicum.filmorate.exception.IncorrectParameterException;
 import ru.java.practicum.filmorate.exception.ValidationException;
 import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.model.User;
+import ru.java.practicum.filmorate.storage.db.FilmDbStorage;
+import ru.java.practicum.filmorate.storage.db.UserDbStorage;
 import ru.java.practicum.filmorate.storage.memory.InMemoryFilmStorage;
 import ru.java.practicum.filmorate.storage.memory.InMemoryUserStorage;
 
@@ -19,13 +21,23 @@ import java.util.List;
 public class FilmService extends AbstractService<Film> {
 
     private static final LocalDate LAST_RELEASE_DATE = LocalDate.of(1895, 12, 28);
-    private final InMemoryFilmStorage inMemoryFilmStorage;
+/*    private final InMemoryFilmStorage inMemoryFilmStorage;
     private final InMemoryUserStorage inMemoryUserStorage;
 
     @Autowired
     public FilmService(InMemoryFilmStorage inMemoryFilmStorage, InMemoryUserStorage inMemoryUserStorage) {
         this.inMemoryFilmStorage = inMemoryFilmStorage;
         this.inMemoryUserStorage = inMemoryUserStorage;
+    }*/    //Старая логика
+
+    private final FilmDbStorage filmDbStorage;
+
+    private final UserDbStorage userDbStorage;
+
+    @Autowired
+    public FilmService(FilmDbStorage filmDbStorage, UserDbStorage userDbStorage) {
+        this.filmDbStorage = filmDbStorage;
+        this.userDbStorage = userDbStorage;
     }
 
     @Override
@@ -48,7 +60,7 @@ public class FilmService extends AbstractService<Film> {
 
     @Override
     public void validateParameters(Long filmId, Long userId) {
-        User user = inMemoryUserStorage.get(userId);
+        User user = userDbStorage.get(userId);   //inMemoryUserStorage
         Film film = getData(filmId);
         if (film == null || user == null) {
             log.info("Ошибка валидации. Проверь null");
@@ -60,23 +72,23 @@ public class FilmService extends AbstractService<Film> {
     public boolean addLike(long filmId, long userId) {
         validateParameters(filmId, userId);
         log.info("Добавляем лайк от пользователя с айди : {} для фильма {}", userId, filmId);
-        return inMemoryFilmStorage.addLike(filmId, userId);
+        return filmDbStorage.addLike(filmId, userId);    //inMemoryFilmStorage
     }
 
     public boolean deleteLike(long filmId, long userId) {
         validateParameters(filmId, userId);
         log.info("Удаляем лайк от пользователя с айди : {}", userId);
-        return inMemoryFilmStorage.deleteLike(filmId, userId);
+        return filmDbStorage.deleteLike(filmId, userId);      //inMemoryFilmStorage
     }
 
     public List<Long> getAllFilmLikes(Long filmId) {
         validateParameter(filmId);
         log.info("Получаем все лайки фильма от пользователей");
-        return inMemoryFilmStorage.getAllFilmLikes(filmId);
+        return filmDbStorage.getAllFilmLikes(filmId);   //inMemoryFilmStorage
     }
 
     public List<Film> getPopularFilms(int count) {
         log.info("Получаем самые залайканые фильмы количеством: {}", count);
-        return inMemoryFilmStorage.getPopularFilms(count);
+        return filmDbStorage.getPopularFilms(count);      //inMemoryFilmStorage
     }
 }
