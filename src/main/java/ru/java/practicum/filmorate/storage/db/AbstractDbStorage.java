@@ -1,16 +1,16 @@
-package ru.java.practicum.filmorate.storage.memory;
-
-
+package ru.java.practicum.filmorate.storage.db;
 import lombok.extern.slf4j.Slf4j;
 import ru.java.practicum.filmorate.model.BaseUnit;
 import ru.java.practicum.filmorate.storage.AbstractStorage;
 
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
-@Deprecated
-public abstract class InMemoryBaseStorage<T extends BaseUnit> implements AbstractStorage<T> {
+public abstract class AbstractDbStorage<T extends BaseUnit> implements AbstractStorage<T> {
+
 
     private final Map<Long, T> storage = new HashMap<>();
 

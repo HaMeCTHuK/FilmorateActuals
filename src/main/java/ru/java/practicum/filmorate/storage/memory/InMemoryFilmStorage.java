@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
+@Deprecated
 public class InMemoryFilmStorage extends InMemoryBaseStorage<Film> implements FilmStorage {
 
     @Override
@@ -39,4 +40,5 @@ public class InMemoryFilmStorage extends InMemoryBaseStorage<Film> implements Fi
 
         return filmsWithMostLikes;
     }
+
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.exception.IncorrectParameterException;
 import ru.java.practicum.filmorate.model.User;
+import ru.java.practicum.filmorate.storage.FriendsStorage;
 import ru.java.practicum.filmorate.storage.memory.InMemoryUserStorage;
 
 import java.util.List;
@@ -15,10 +16,17 @@ import java.util.List;
 public class UserService extends AbstractService<User> {
 
     private final InMemoryUserStorage inMemoryUserStorage;
+    private final FriendsStorage friendsStorage; /////////////////
+
+/*    @Autowired
+    public UserService(InMemoryUserStorage inMemoryUserStorage) {
+        this.inMemoryUserStorage = inMemoryUserStorage;
+    }*/
 
     @Autowired
-    public UserService(InMemoryUserStorage inMemoryUserStorage) {   //////
+    public UserService(InMemoryUserStorage inMemoryUserStorage, FriendsStorage friendsStorage) {   //////
         this.inMemoryUserStorage = inMemoryUserStorage;
+        this.friendsStorage=friendsStorage;
     }
 
     @Override
@@ -75,4 +83,5 @@ public class UserService extends AbstractService<User> {
         log.info("Получаем список общих друзей пользоватеей ID: " + userId + " и " + friendId);
         return inMemoryUserStorage.getCommonFriends(userId, friendId);
     }
+
 }

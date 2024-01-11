@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.model.BaseUnit;
+import ru.java.practicum.filmorate.storage.db.AbstractDbStorage;
 import ru.java.practicum.filmorate.storage.memory.InMemoryBaseStorage;
 
 import java.util.*;
@@ -12,6 +13,8 @@ import java.util.*;
 public abstract class AbstractService<T extends BaseUnit> {
     @Autowired
     protected InMemoryBaseStorage<T> inMemoryBaseStorage;
+    @Autowired
+    protected AbstractDbStorage<T> abstractDbStorage;
 
     public abstract void validate(T data);
 
@@ -22,27 +25,27 @@ public abstract class AbstractService<T extends BaseUnit> {
     public T create(T data) {
         validate(data);
         log.info("добавляем еще пытаемся");
-        return inMemoryBaseStorage.create(data);
+        return abstractDbStorage.create(data);    ///inMemoryBaseStorage
     }
 
     public T update(T data) {
         validate(data);
-        if (inMemoryBaseStorage.get(data.getId()) == null) {
+        if (abstractDbStorage.get(data.getId()) == null) {    ///inMemoryBaseStorage
             log.info("Данные пользователя не найдены");
             throw new DataNotFoundException("Данные пользователя не найдены");
         }
-        return inMemoryBaseStorage.update(data);
+        return abstractDbStorage.update(data);    ////inMemoryBaseStorage
     }
 
     public List<T> getAll() {
-       return inMemoryBaseStorage.getAll();
-    }
+       return abstractDbStorage.getAll();
+    }   ///inMemoryBaseStorage
 
     public T getData(Long id) {
-        if (inMemoryBaseStorage.get(id) == null) {
+        if (abstractDbStorage.get(id) == null) {         ///inMemoryBaseStorage
             log.info("Данные пользователя не найдены");
             throw new DataNotFoundException("Данные пользователя не найдены");
         }
-        return inMemoryBaseStorage.get(id);
+        return abstractDbStorage.get(id);     ///inMemoryBaseStorage
     }
 }
