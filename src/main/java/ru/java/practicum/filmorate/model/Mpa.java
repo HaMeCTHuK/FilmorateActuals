@@ -13,5 +13,5 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class Mpa extends BaseUnit {
     @NotBlank
-    String rating_name;
+    String ratingName;
 }

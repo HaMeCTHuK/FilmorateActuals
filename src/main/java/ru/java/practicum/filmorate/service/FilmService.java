@@ -2,12 +2,15 @@ package ru.java.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.exception.IncorrectParameterException;
 import ru.java.practicum.filmorate.exception.ValidationException;
 import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.model.User;
+import ru.java.practicum.filmorate.storage.FilmStorage;
+import ru.java.practicum.filmorate.storage.UserStorage;
 import ru.java.practicum.filmorate.storage.db.FilmDbStorage;
 import ru.java.practicum.filmorate.storage.db.UserDbStorage;
 import ru.java.practicum.filmorate.storage.memory.InMemoryFilmStorage;
@@ -21,23 +24,15 @@ import java.util.List;
 public class FilmService extends AbstractService<Film> {
 
     private static final LocalDate LAST_RELEASE_DATE = LocalDate.of(1895, 12, 28);
-/*    private final InMemoryFilmStorage inMemoryFilmStorage;
-    private final InMemoryUserStorage inMemoryUserStorage;
+
+    private final FilmStorage filmStorage;
+
+    private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(InMemoryFilmStorage inMemoryFilmStorage, InMemoryUserStorage inMemoryUserStorage) {
-        this.inMemoryFilmStorage = inMemoryFilmStorage;
-        this.inMemoryUserStorage = inMemoryUserStorage;
-    }*/    //Старая логика
-
-    private final FilmDbStorage filmDbStorage;
-
-    private final UserDbStorage userDbStorage;
-
-    @Autowired
-    public FilmService(FilmDbStorage filmDbStorage, UserDbStorage userDbStorage) {
-        this.filmDbStorage = filmDbStorage;
-        this.userDbStorage = userDbStorage;
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, UserStorage userStorage) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
     }
 
     @Override
@@ -60,7 +55,7 @@ public class FilmService extends AbstractService<Film> {
 
     @Override
     public void validateParameters(Long filmId, Long userId) {
-        User user = userDbStorage.get(userId);   //inMemoryUserStorage
+        User user = userStorage.get(userId);   //inMemoryUserStorage
         Film film = getData(filmId);
         if (film == null || user == null) {
             log.info("Ошибка валидации. Проверь null");
@@ -72,23 +67,23 @@ public class FilmService extends AbstractService<Film> {
     public boolean addLike(long filmId, long userId) {
         validateParameters(filmId, userId);
         log.info("Добавляем лайк от пользователя с айди : {} для фильма {}", userId, filmId);
-        return filmDbStorage.addLike(filmId, userId);    //inMemoryFilmStorage
+        return filmStorage.addLike(filmId, userId);    //inMemoryFilmStorage
     }
 
     public boolean deleteLike(long filmId, long userId) {
         validateParameters(filmId, userId);
         log.info("Удаляем лайк от пользователя с айди : {}", userId);
-        return filmDbStorage.deleteLike(filmId, userId);      //inMemoryFilmStorage
+        return filmStorage.deleteLike(filmId, userId);      //inMemoryFilmStorage
     }
 
     public List<Long> getAllFilmLikes(Long filmId) {
         validateParameter(filmId);
         log.info("Получаем все лайки фильма от пользователей");
-        return filmDbStorage.getAllFilmLikes(filmId);   //inMemoryFilmStorage
+        return filmStorage.getAllFilmLikes(filmId);   //inMemoryFilmStorage
     }
 
     public List<Film> getPopularFilms(int count) {
         log.info("Получаем самые залайканые фильмы количеством: {}", count);
-        return filmDbStorage.getPopularFilms(count);      //inMemoryFilmStorage
+        return filmStorage.getPopularFilms(count);      //inMemoryFilmStorage
     }
 }

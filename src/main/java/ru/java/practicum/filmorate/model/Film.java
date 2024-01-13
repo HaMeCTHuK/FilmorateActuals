@@ -27,9 +27,15 @@ public class Film extends BaseUnit {
     private LocalDate releaseDate;
     @Min(value = 1, message = "Не может быть <= 0")
     private int duration;
-    private HashSet<Long> likes = new HashSet<>(); //для лайков
+    private int rating;
     @NotNull
-    private Mpa mpa;
+    private int mpaRatingId;
+
+
+
+
+    private HashSet<Long> likes = new HashSet<>(); //для лайков
+
 
     public int getLikesCount() {
         return likes.size();
@@ -44,6 +50,7 @@ public class Film extends BaseUnit {
     }
 
     public HashSet<Long> getLikes() {
+
         return new HashSet<>(likes);
     }
 

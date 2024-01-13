@@ -11,8 +11,7 @@ import java.util.*;
 
 @Slf4j
 public abstract class AbstractService<T extends BaseUnit> {
-    @Autowired
-    protected InMemoryBaseStorage<T> inMemoryBaseStorage;
+
     @Autowired
     protected AbstractDbStorage<T> abstractDbStorage;
 
@@ -25,12 +24,12 @@ public abstract class AbstractService<T extends BaseUnit> {
     public T create(T data) {
         validate(data);
         log.info("добавляем еще пытаемся");
-        return abstractDbStorage.create(data);    ///inMemoryBaseStorage
+        return abstractDbStorage.create(data);
     }
 
     public T update(T data) {
         validate(data);
-        if (abstractDbStorage.get(data.getId()) == null) {    ///inMemoryBaseStorage
+        if (abstractDbStorage.get(data.getId()) == null) {
             log.info("Данные пользователя не найдены");
             throw new DataNotFoundException("Данные пользователя не найдены");
         }
@@ -39,13 +38,13 @@ public abstract class AbstractService<T extends BaseUnit> {
 
     public List<T> getAll() {
        return abstractDbStorage.getAll();
-    }   ///inMemoryBaseStorage
+    }
 
     public T getData(Long id) {
-        if (abstractDbStorage.get(id) == null) {         ///inMemoryBaseStorage
+        if (abstractDbStorage.get(id) == null) {
             log.info("Данные пользователя не найдены");
             throw new DataNotFoundException("Данные пользователя не найдены");
         }
-        return abstractDbStorage.get(id);     ///inMemoryBaseStorage
+        return abstractDbStorage.get(id);
     }
 }

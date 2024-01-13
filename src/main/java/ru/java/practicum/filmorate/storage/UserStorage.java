@@ -11,4 +11,6 @@ public interface UserStorage extends AbstractStorage<User> {
     boolean addFriend(Long userId, Long friendId);
 
     boolean deleteFriend(Long userId, Long friendId);
+
+    List<User> getCommonFriends(Long userId, Long friendId);
 }

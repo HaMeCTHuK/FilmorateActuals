@@ -2,6 +2,7 @@ package ru.java.practicum.filmorate.storage.db;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.model.Mpa;
@@ -34,10 +35,35 @@ public class MpaDbStorage extends AbstractDbStorage<Mpa> implements MpaStorage {
         return genres.get(0);
     }
 
-    static Mpa createMpa (ResultSet rs, int rowNum) throws SQLException {
+    @Override
+    protected String getTableName() {
+        return "MPARating";
+    }
+
+    @Override
+    protected String getCreateSql() {
+        return "INSERT INTO MPARating (id, rating_name) VALUES (?, ?)";
+    }
+
+    @Override
+    protected String getUpdateSql() {
+        return "UPDATE MPARating SET rating_name = ? WHERE id = ?";
+    }
+
+    @Override
+    protected Object[] getParameters(Mpa data) {
+        return new Object[]{data.getId(), data.getRatingName()};
+    }
+
+    @Override
+    protected RowMapper<Mpa> getRowMapper() {
+        return MpaDbStorage::createMpa;
+    }
+
+    static Mpa createMpa(ResultSet rs, int rowNum) throws SQLException {
         return Mpa.builder()
                 .id(rs.getLong("id"))
-                .rating_name(rs.getString("rating_name"))
+                .ratingName(rs.getString("rating_name"))
                 .build();
     }
 }
