@@ -18,7 +18,7 @@ public class MpaService extends AbstractService<Mpa> {
     }
 
     public List<Mpa> getAllMpa() {
-        return mpaStorage.getAll(); ///?????
+        return mpaStorage.getAll();
     }
 
     public Mpa getMpa(long id) {

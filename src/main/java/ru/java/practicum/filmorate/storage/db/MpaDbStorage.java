@@ -2,7 +2,6 @@ package ru.java.practicum.filmorate.storage.db;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.model.Mpa;
@@ -14,17 +13,34 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class MpaDbStorage extends AbstractDbStorage<Mpa> implements MpaStorage {
+public class MpaDbStorage implements MpaStorage {
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
+    // Метод для создания нового MPA рейтинга в базе данных
+    @Override
+    public Mpa create(Mpa mpa) {
+        String sql = "INSERT INTO MPARating (rating_name) VALUES (?)";
+        jdbcTemplate.update(sql, mpa.getRatingName());
+        return get(mpa.getId());
+    }
+
+    // Метод для обновления информации о MPA рейтинге в базе данных
+    @Override
+    public Mpa update(Mpa mpa) {
+        String sql = "UPDATE MPARating SET rating_name = ? WHERE id = ?";
+        jdbcTemplate.update(sql, mpa.getRatingName(), mpa.getId());
+        return get(mpa.getId());
+    }
+
+    // Метод для получения списка всех MPA рейтингов
     @Override
     public List<Mpa> getAll() {
         String sqlQuery = "SELECT * FROM MPARating";
         return jdbcTemplate.query(sqlQuery, MpaDbStorage::createMpa);
-
     }
 
+    // Метод для получения информации о MPA рейтинге по его идентификатору
     @Override
     public Mpa get(Long id) {
         String sqlQuery = "SELECT * FROM MPARating WHERE id = ?";
@@ -35,31 +51,22 @@ public class MpaDbStorage extends AbstractDbStorage<Mpa> implements MpaStorage {
         return genres.get(0);
     }
 
+    // Метод для удаления MPA рейтинга по его идентификатору
     @Override
-    protected String getTableName() {
-        return "MPARating";
+    public void delete(Long id) {
+        String sqlQuery = "DELETE FROM MPARating WHERE id = ?";
+        int affectedRows = jdbcTemplate.update(sqlQuery, id);
+        if (affectedRows != 1) {
+            throw new DataNotFoundException("При удалении MPA по id количество удаленных строк не равно 1");
+        }
     }
 
-    @Override
-    protected String getCreateSql() {
-        return "INSERT INTO MPARating (id, rating_name) VALUES (?, ?)";
-    }
-
-    @Override
-    protected String getUpdateSql() {
-        return "UPDATE MPARating SET rating_name = ? WHERE id = ?";
-    }
-
-    @Override
+    // Вспомогательный метод для извлечения параметров MPA рейтинга из ResultSet
     protected Object[] getParameters(Mpa data) {
         return new Object[]{data.getId(), data.getRatingName()};
     }
 
-    @Override
-    protected RowMapper<Mpa> getRowMapper() {
-        return MpaDbStorage::createMpa;
-    }
-
+    // Вспомогательный метод для создания объекта MPA из ResultSet
     static Mpa createMpa(ResultSet rs, int rowNum) throws SQLException {
         return Mpa.builder()
                 .id(rs.getLong("id"))
