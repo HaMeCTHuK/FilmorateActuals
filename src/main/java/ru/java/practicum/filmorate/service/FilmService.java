@@ -10,6 +10,7 @@ import ru.java.practicum.filmorate.exception.ValidationException;
 import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.model.User;
 import ru.java.practicum.filmorate.storage.FilmStorage;
+import ru.java.practicum.filmorate.storage.LikesStorage;
 import ru.java.practicum.filmorate.storage.UserStorage;
 
 
@@ -26,11 +27,15 @@ public class FilmService extends AbstractService<Film> {
 
     private final UserStorage userStorage;
 
+    private final LikesStorage likesStorage;
+
     @Autowired
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
-                       @Qualifier( "userDbStorage") UserStorage userStorage) {
+                       @Qualifier( "userDbStorage") UserStorage userStorage,
+                       @Qualifier( "likesDbStorage") LikesStorage likesStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.likesStorage = likesStorage;
     }
 
     @Override
@@ -62,27 +67,27 @@ public class FilmService extends AbstractService<Film> {
         }
     }
 
-    public boolean addLike(long filmId, long userId) {
+    public void addLike(long filmId, long userId) {
         validateParameters(filmId, userId);
         log.info("Добавляем лайк от пользователя с айди : {} для фильма {}", userId, filmId);
-        return filmStorage.addLike(filmId, userId);
+        likesStorage.addLike(filmId, userId);
     }
 
-    public boolean deleteLike(long filmId, long userId) {
+    public void deleteLike(long filmId, long userId) {
         validateParameters(filmId, userId);
         log.info("Удаляем лайк от пользователя с айди : {}", userId);
-        return filmStorage.deleteLike(filmId, userId);
+        likesStorage.deleteLike(filmId, userId);
     }
 
     public List<Long> getAllFilmLikes(Long filmId) {
         validateParameter(filmId);
         log.info("Получаем все лайки фильма от пользователей");
-        return filmStorage.getAllFilmLikes(filmId);
+        return likesStorage.getAllFilmLikes(filmId);
     }
 
     public List<Film> getPopularFilms(int count) {
         log.info("Получаем самые залайканые фильмы количеством: {}", count);
-        return filmStorage.getPopularFilms(count);
+        return likesStorage.getPopularFilms(count);
     }
 
 }

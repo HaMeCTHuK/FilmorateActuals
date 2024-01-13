@@ -18,7 +18,7 @@ public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    // Метод для получения списка всех друзей пользователя
+ /*   // Метод для получения списка всех друзей пользователя
     @Override
     public List<User> getAllFriends(Long userId) {
         String sqlQuery = "SELECT * FROM FRIENDS WHERE user_id = ?";
@@ -40,6 +40,17 @@ public class UserDbStorage implements UserStorage {
         int affectedRows = jdbcTemplate.update(sqlQuery, userId, friendId);
         return affectedRows > 0;
     }
+
+     // Метод для получения списка общих друзей двух пользователей
+    public List<User> getCommonFriends(Long userId, Long friendId) {
+        String sqlQuery = "SELECT u.* FROM USERS u " +
+                "JOIN FRIENDS f1 ON u.id = f1.friend_id " +
+                "JOIN FRIENDS f2 ON u.id = f2.friend_id " +
+                "WHERE f1.user_id = ? AND f2.user_id = ?";
+
+        return jdbcTemplate.query(sqlQuery, UserDbStorage::createUser, userId, friendId);
+    }
+    */
 
     // Метод для создания нового пользователя в базе данных
     @Override
@@ -79,16 +90,6 @@ public class UserDbStorage implements UserStorage {
         String sql = "DELETE FROM USERS WHERE id = ?";
         jdbcTemplate.update(sql, id);
         log.info("Удален объект с id=" + id);
-    }
-
-    // Метод для получения списка общих друзей двух пользователей
-    public List<User> getCommonFriends(Long userId, Long friendId) {
-        String sqlQuery = "SELECT u.* FROM USERS u " +
-                "JOIN FRIENDS f1 ON u.id = f1.friend_id " +
-                "JOIN FRIENDS f2 ON u.id = f2.friend_id " +
-                "WHERE f1.user_id = ? AND f2.user_id = ?";
-
-        return jdbcTemplate.query(sqlQuery, UserDbStorage::createUser, userId, friendId);
     }
 
     // Вспомогательный метод для извлечения параметров пользователя из ResultSet

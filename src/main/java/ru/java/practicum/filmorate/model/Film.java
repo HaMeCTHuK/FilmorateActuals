@@ -32,6 +32,7 @@ public class Film extends BaseUnit {
     private int mpaRatingId;
 
 
+/*
 
 
     private HashSet<Long> likes = new HashSet<>(); //для лайков
@@ -53,5 +54,6 @@ public class Film extends BaseUnit {
 
         return new HashSet<>(likes);
     }
+*/
 
 }

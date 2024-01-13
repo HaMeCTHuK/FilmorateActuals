@@ -13,7 +13,8 @@ import java.util.List;
 @Deprecated
 public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements UserStorage {
 
-    @Override
+/*
+
     public List<User> getAllFriends(Long userId) {
         User user = get(userId);
         ArrayList<Long> friensIds = new ArrayList<>(user.getFriends());
@@ -26,7 +27,7 @@ public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements Us
         return allFriends;
     }
 
-    @Override
+
     public boolean addFriend(Long userId, Long friendId) {
         User user = get(userId);
         User friend = get(friendId);
@@ -36,7 +37,7 @@ public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements Us
         return isAdded;
     }
 
-    @Override
+
     public boolean deleteFriend(Long userId, Long friendId) {
         User user = get(userId);
         User friend = get(friendId);
@@ -59,5 +60,6 @@ public class InMemoryUserStorage extends InMemoryBaseStorage<User> implements Us
         log.info("Список общих друзей: " + commonFriendsList);
         return commonFriendsList;
     }
+*/
 
 }
