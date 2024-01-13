@@ -3,7 +3,6 @@ package ru.java.practicum.filmorate.storage.db;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.java.practicum.filmorate.model.User;
 import ru.java.practicum.filmorate.storage.UserStorage;
@@ -15,21 +14,18 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UserDbStorage extends AbstractDbStorage<User> implements UserStorage {
+public class UserDbStorage implements UserStorage {
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
-    //private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    /*    private static LocalDate parseLocalDate(String dateStr) {
-        return LocalDate.parse(dateStr, dateFormatter);
-    }*/
-
+    // Метод для получения списка всех друзей пользователя
     @Override
     public List<User> getAllFriends(Long userId) {
         String sqlQuery = "SELECT * FROM FRIENDS WHERE user_id = ?";
         return jdbcTemplate.query(sqlQuery, UserDbStorage::createUser, userId);
     }
 
+    // Метод для добавления друга пользователю
     @Override
     public boolean addFriend(Long userId, Long friendId) {
         String sqlQuery = "INSERT INTO FRIENDS (user_id, friend_id) VALUES (?, ?)";
@@ -37,6 +33,7 @@ public class UserDbStorage extends AbstractDbStorage<User> implements UserStorag
         return affectedRows > 0;
     }
 
+    // Метод для удаления друга пользователя
     @Override
     public boolean deleteFriend(Long userId, Long friendId) {
         String sqlQuery = "DELETE FROM FRIENDS WHERE user_id = ? AND friend_id = ?";
@@ -44,32 +41,47 @@ public class UserDbStorage extends AbstractDbStorage<User> implements UserStorag
         return affectedRows > 0;
     }
 
+    // Метод для создания нового пользователя в базе данных
     @Override
-    public User create(User data) {
-        return super.create(data);
+    public User create(User user) {
+        String sql = "INSERT INTO USERS (email, login, name, birthday) VALUES (?, ?, ?, ?)";
+        jdbcTemplate.update(sql, getParameters(user));
+        log.info("Добавлен объект: " + user);
+        return user;
     }
 
+    // Метод для обновления информации о пользователе в базе данных
     @Override
-    public User update(User data) {
-        return super.update(data);
+    public User update(User user) {
+        String sql = "UPDATE USERS SET email=?, login=?, name=?, birthday=? WHERE id=?";
+        jdbcTemplate.update(sql, getParameters(user));
+        log.info("Обновлен объект: " + user);
+        return user;
     }
 
+    // Метод для получения списка всех пользователей
     @Override
     public List<User> getAll() {
-        String sqlQuery = "SELECT * FROM USERS";
-        return jdbcTemplate.query(sqlQuery, UserDbStorage::createUser);
+        String sql = "SELECT * FROM USERS";
+        return jdbcTemplate.query(sql, UserDbStorage::createUser);
     }
 
+    // Метод для получения информации о пользователе по его идентификатору
     @Override
     public User get(Long id) {
-        return super.get(id);
+        String sql = "SELECT * FROM USERS WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, UserDbStorage::createUser, id);
     }
 
+    // Метод для удаления пользователя по его идентификатору
     @Override
     public void delete(Long id) {
-        super.delete(id);
+        String sql = "DELETE FROM USERS WHERE id = ?";
+        jdbcTemplate.update(sql, id);
+        log.info("Удален объект с id=" + id);
     }
 
+    // Метод для получения списка общих друзей двух пользователей
     public List<User> getCommonFriends(Long userId, Long friendId) {
         String sqlQuery = "SELECT u.* FROM USERS u " +
                 "JOIN FRIENDS f1 ON u.id = f1.friend_id " +
@@ -79,27 +91,13 @@ public class UserDbStorage extends AbstractDbStorage<User> implements UserStorag
         return jdbcTemplate.query(sqlQuery, UserDbStorage::createUser, userId, friendId);
     }
 
-    @Override
-    protected String getTableName() {
-        return "USERS";
+    // Вспомогательный метод для извлечения параметров пользователя из ResultSet
+    protected Object[] getParameters(User user) {
+        return new Object[]{user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId()};
     }
 
-    @Override
-    protected String getCreateSql() {
-        return "INSERT INTO USERS (email, login, name, birthday) VALUES (?, ?, ?, ?)";
-    }
-
-    @Override
-    protected String getUpdateSql() {
-        return "UPDATE USERS SET email=?, login=?, name=?, birthday=? WHERE id=?";
-    }
-
-    @Override
-    protected Object[] getParameters(User data) {
-        return new Object[]{data.getEmail(), data.getLogin(), data.getName(), data.getBirthday(), data.getId()};
-    }
-
-    private static User mapUserFromResultSet(ResultSet rs) throws SQLException {
+    // Вспомогательный метод для создания объекта пользователя из ResultSet
+    private static User createUser(ResultSet rs, int rowNum) throws SQLException {
         return User.builder()
                 .id(rs.getLong("id"))
                 .email(rs.getString("email"))
@@ -107,14 +105,5 @@ public class UserDbStorage extends AbstractDbStorage<User> implements UserStorag
                 .name(rs.getString("name"))
                 .birthday(rs.getDate("birthday").toLocalDate())
                 .build();
-    }
-
-    @Override
-    protected RowMapper<User> getRowMapper() {
-        return (rs, rowNum) -> mapUserFromResultSet(rs);
-    }
-
-    static User createUser(ResultSet rs, int rowNum) throws SQLException {
-        return mapUserFromResultSet(rs);
     }
 }

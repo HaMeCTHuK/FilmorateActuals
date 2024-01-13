@@ -1,11 +1,10 @@
 package ru.java.practicum.filmorate.storage;
 
-import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.model.User;
 
 import java.util.List;
 
-public interface FriendsStorage extends AbstractStorage<User> {
+public interface FriendsStorage {
 
     List<User> getAllFriends(Long userId);
 

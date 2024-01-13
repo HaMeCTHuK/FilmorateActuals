@@ -9,9 +9,6 @@ import ru.java.practicum.filmorate.exception.IncorrectParameterException;
 import ru.java.practicum.filmorate.model.User;
 import ru.java.practicum.filmorate.storage.FriendsStorage;
 import ru.java.practicum.filmorate.storage.UserStorage;
-import ru.java.practicum.filmorate.storage.db.AbstractDbStorage;
-import ru.java.practicum.filmorate.storage.db.UserDbStorage;
-import ru.java.practicum.filmorate.storage.memory.InMemoryUserStorage;
 
 import java.util.List;
 
