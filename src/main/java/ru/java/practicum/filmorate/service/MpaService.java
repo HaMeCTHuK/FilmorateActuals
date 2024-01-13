@@ -1,10 +1,14 @@
 package ru.java.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import ru.java.practicum.filmorate.model.Mpa;
 import ru.java.practicum.filmorate.storage.MpaStorage;
 
 import java.util.List;
 
+@Service
+@Slf4j
 public class MpaService extends AbstractService<Mpa> {
 
     private final MpaStorage mpaStorage;

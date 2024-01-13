@@ -1,49 +1,64 @@
 package ru.java.practicum.filmorate.storage.db;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 import ru.java.practicum.filmorate.model.BaseUnit;
 import ru.java.practicum.filmorate.storage.AbstractStorage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
+@Component
+@RequiredArgsConstructor
 public abstract class AbstractDbStorage<T extends BaseUnit> implements AbstractStorage<T> {
 
-
-    private final Map<Long, T> storage = new HashMap<>();
-
-    private long generateId = 0;
-
+    private JdbcTemplate jdbcTemplate;
 
     @Override
     public T create(T data) {
-        data.setId(++generateId);
-        storage.put(data.getId(), data);
-        log.info("добавили " + data);
+        String sql = getCreateSql();
+        jdbcTemplate.update(sql, getParameters(data));
+        log.info("Добавлен объект: " + data);
         return data;
     }
 
     @Override
     public T update(T data) {
-        storage.put(data.getId(), data);
-        log.info("обновили " + data);
+        String sql = getUpdateSql();
+        jdbcTemplate.update(sql, getParameters(data));
+        log.info("Обновлен объект: " + data);
         return data;
     }
 
     @Override
     public List<T> getAll() {
-        return new ArrayList<>(storage.values());
+        String sql = "SELECT * FROM " + getTableName();
+        return jdbcTemplate.query(sql, getRowMapper());
     }
 
     @Override
     public T get(Long id) {
-        return storage.get(id);
+        String sql = "SELECT * FROM " + getTableName() + " WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, getRowMapper(), id);
     }
 
     @Override
     public void delete(Long id) {
-        //реализовать по необходимости CRUD
+        String sql = "DELETE FROM " + getTableName() + " WHERE id = ?";
+        jdbcTemplate.update(sql, id);
+        log.info("Удален объект с id=" + id);
     }
+
+    protected abstract String getTableName();
+
+    protected abstract String getCreateSql();
+
+    protected abstract String getUpdateSql();
+
+    protected abstract Object[] getParameters(T data);
+
+    protected abstract RowMapper<T> getRowMapper();
 }

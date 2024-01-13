@@ -2,11 +2,15 @@ package ru.java.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.exception.IncorrectParameterException;
 import ru.java.practicum.filmorate.model.User;
 import ru.java.practicum.filmorate.storage.FriendsStorage;
+import ru.java.practicum.filmorate.storage.UserStorage;
+import ru.java.practicum.filmorate.storage.db.AbstractDbStorage;
+import ru.java.practicum.filmorate.storage.db.UserDbStorage;
 import ru.java.practicum.filmorate.storage.memory.InMemoryUserStorage;
 
 import java.util.List;
@@ -15,17 +19,12 @@ import java.util.List;
 @Slf4j
 public class UserService extends AbstractService<User> {
 
-    private final InMemoryUserStorage inMemoryUserStorage;
-    private final FriendsStorage friendsStorage; /////////////////
-
-/*    @Autowired
-    public UserService(InMemoryUserStorage inMemoryUserStorage) {
-        this.inMemoryUserStorage = inMemoryUserStorage;
-    }*/
+    private final UserStorage userStorage;
+    private final FriendsStorage friendsStorage;
 
     @Autowired
-    public UserService(InMemoryUserStorage inMemoryUserStorage, FriendsStorage friendsStorage) {   //////
-        this.inMemoryUserStorage = inMemoryUserStorage;
+    public UserService(@Qualifier( "userDbStorage") UserStorage userStorage, FriendsStorage friendsStorage) {
+        this.userStorage = userStorage;
         this.friendsStorage=friendsStorage;
     }
 
@@ -63,25 +62,25 @@ public class UserService extends AbstractService<User> {
     public List<User> getAllFriends(Long userId) {
         validateParameter(userId);
         log.info("Получаем список друзей");
-        return inMemoryUserStorage.getAllFriends(userId);
+        return friendsStorage.getAllFriends(userId);
     }
 
     public boolean addFriend(Long userId, Long friendId) {
         validateParameters(userId, friendId);
         log.info("Добавляем пользователю ID: " + userId + ", друга с friendId: " + friendId);
-        return inMemoryUserStorage.addFriend(userId, friendId);
+        return userStorage.addFriend(userId, friendId);
     }
 
     public boolean deleteFriend(Long userId, Long friendId) {
         validateParameters(userId, friendId);
         log.info("Удаляем у пользователя ID: " + userId + " друга с friendId: " + friendId);
-        return inMemoryUserStorage.deleteFriend(userId, friendId);
+        return userStorage.deleteFriend(userId, friendId);
     }
 
     public List<User> getCommonFriends(Long userId, Long friendId) {
         validateParameters(userId, friendId);
         log.info("Получаем список общих друзей пользоватеей ID: " + userId + " и " + friendId);
-        return inMemoryUserStorage.getCommonFriends(userId, friendId);
+        return userStorage.getCommonFriends(userId, friendId);
     }
 
 }

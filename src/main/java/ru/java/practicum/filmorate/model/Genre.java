@@ -14,5 +14,5 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class Genre extends BaseUnit {
     @NotBlank
-    String genre_name;
+    String genreName;
 }
