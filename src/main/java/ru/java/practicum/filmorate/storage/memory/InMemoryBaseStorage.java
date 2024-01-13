@@ -46,4 +46,6 @@ public abstract class InMemoryBaseStorage<T extends BaseUnit> implements Abstrac
     public void delete(Long id) {
         //реализовать по необходимости CRUD
     }
+
+
 }
