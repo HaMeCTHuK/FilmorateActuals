@@ -22,7 +22,7 @@ public class UserService extends AbstractService<User> {
     @Autowired
     public UserService(@Qualifier( "userDbStorage") UserStorage userStorage, FriendsStorage friendsStorage) {
         this.userStorage = userStorage;
-        this.friendsStorage=friendsStorage;
+        this.friendsStorage = friendsStorage;
     }
 
     @Override
@@ -65,19 +65,19 @@ public class UserService extends AbstractService<User> {
     public boolean addFriend(Long userId, Long friendId) {
         validateParameters(userId, friendId);
         log.info("Добавляем пользователю ID: " + userId + ", друга с friendId: " + friendId);
-        return userStorage.addFriend(userId, friendId);
+        return friendsStorage.addFriend(userId, friendId);
     }
 
     public boolean deleteFriend(Long userId, Long friendId) {
         validateParameters(userId, friendId);
         log.info("Удаляем у пользователя ID: " + userId + " друга с friendId: " + friendId);
-        return userStorage.deleteFriend(userId, friendId);
+        return friendsStorage.deleteFriend(userId, friendId);
     }
 
     public List<User> getCommonFriends(Long userId, Long friendId) {
         validateParameters(userId, friendId);
         log.info("Получаем список общих друзей пользоватеей ID: " + userId + " и " + friendId);
-        return userStorage.getCommonFriends(userId, friendId);
+        return friendsStorage.getCommonFriends(userId, friendId);
     }
 
 }

@@ -73,7 +73,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     // Метод для получения списка идентификаторов фильмов, которые лайкнул пользователь
-    @Override
+   /* @Override
     public List<Long> getAllFilmLikes(Long userId) {
         String sqlQuery = "SELECT film_id FROM LIKES WHERE user_id = ?";
         return jdbcTemplate.queryForList(sqlQuery, Long.class, userId);
@@ -100,7 +100,7 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> getPopularFilms(int count) {
         String sqlQuery = "SELECT * FROM FILMS ORDER BY rating DESC LIMIT ?";
         return jdbcTemplate.query(sqlQuery, FilmDbStorage::createFilm, count);
-    }
+    }*/
 
     // Вспомогательный метод для извлечения параметров для SQL-запросов
     protected Object[] getParameters(Film film) {

@@ -6,11 +6,4 @@ import java.util.List;
 
 public interface UserStorage extends AbstractStorage<User> {
 
-    List<User> getAllFriends(Long userId);
-
-    boolean addFriend(Long userId, Long friendId);
-
-    boolean deleteFriend(Long userId, Long friendId);
-
-    List<User> getCommonFriends(Long userId, Long friendId);
 }

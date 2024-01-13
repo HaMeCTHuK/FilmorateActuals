@@ -17,21 +17,6 @@ public class GenreDbStorage implements GenreStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-/*    // Метод для создания нового жанра в базе данных
-    @Override
-    public Genre create(Genre genre) {
-        String sql = "INSERT INTO GENRES (genre_name) VALUES (?)";
-        jdbcTemplate.update(sql, genre.getGenreName());
-        return get(genre.getId());
-    }
-
-    // Метод для обновления информации о жанре в базе данных
-    @Override
-    public Genre update(Genre data) {
-        String sql = "UPDATE GENRES SET genre_name = ? WHERE id = ?";
-        jdbcTemplate.update(sql, data.getGenreName(), data.getId());
-        return get(data.getId());
-    }*/
 
     // Метод для получения списка всех жанров
     @Override
@@ -40,15 +25,6 @@ public class GenreDbStorage implements GenreStorage {
         return jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenre);
     }
 
-/*    // Метод для удаления жанра по его идентификатору
-    @Override
-    public void delete(Long id) {
-        String sqlQuery = "DELETE FROM GENRES WHERE id = ?";
-        int affectedRows = jdbcTemplate.update(sqlQuery, id);
-        if (affectedRows != 1) {
-            throw new DataNotFoundException("При удалении жанра по id количество удаленных строк не равно 1");
-        }
-    }*/
 
     // Метод для получения информации о жанре по его идентификатору
     @Override

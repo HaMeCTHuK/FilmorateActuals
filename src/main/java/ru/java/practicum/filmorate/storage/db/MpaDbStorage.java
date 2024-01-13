@@ -17,8 +17,9 @@ public class MpaDbStorage implements MpaStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    // Метод для создания нового MPA рейтинга в базе данных
-    @Override
+
+   /* @Override
+   // Метод для создания нового MPA рейтинга в базе данных
     public Mpa create(Mpa mpa) {
         String sql = "INSERT INTO MPARating (rating_name) VALUES (?)";
         jdbcTemplate.update(sql, mpa.getRatingName());
@@ -31,7 +32,17 @@ public class MpaDbStorage implements MpaStorage {
         String sql = "UPDATE MPARating SET rating_name = ? WHERE id = ?";
         jdbcTemplate.update(sql, mpa.getRatingName(), mpa.getId());
         return get(mpa.getId());
+
+            // Метод для удаления MPA рейтинга по его идентификатору
+    @Override
+    public void delete(Long id) {
+        String sqlQuery = "DELETE FROM MPARating WHERE id = ?";
+        int affectedRows = jdbcTemplate.update(sqlQuery, id);
+        if (affectedRows != 1) {
+            throw new DataNotFoundException("При удалении MPA по id количество удаленных строк не равно 1");
+        }
     }
+    }*/
 
     // Метод для получения списка всех MPA рейтингов
     @Override
@@ -49,16 +60,6 @@ public class MpaDbStorage implements MpaStorage {
             throw new DataNotFoundException("При получении MPA по id список не равен 1");
         }
         return genres.get(0);
-    }
-
-    // Метод для удаления MPA рейтинга по его идентификатору
-    @Override
-    public void delete(Long id) {
-        String sqlQuery = "DELETE FROM MPARating WHERE id = ?";
-        int affectedRows = jdbcTemplate.update(sqlQuery, id);
-        if (affectedRows != 1) {
-            throw new DataNotFoundException("При удалении MPA по id количество удаленных строк не равно 1");
-        }
     }
 
     // Вспомогательный метод для извлечения параметров MPA рейтинга из ResultSet
