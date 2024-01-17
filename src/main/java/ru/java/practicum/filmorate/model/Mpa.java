@@ -14,4 +14,5 @@ import javax.validation.constraints.NotBlank;
 public class Mpa extends BaseUnit {
     @NotBlank
     String ratingName;
+
 }

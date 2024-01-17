@@ -5,7 +5,7 @@ import ru.java.practicum.filmorate.model.Genre;
 
 import java.util.List;
 
-public interface GenreStorage {
+public interface GenreStorage extends AbstractStorage<Genre>{
 
     List<Genre> getAll();
 

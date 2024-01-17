@@ -1,5 +1,6 @@
 package ru.java.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,17 +17,17 @@ import java.util.List;
 @Slf4j
 public class UserService extends AbstractService<User> {
 
-    private final UserStorage userStorage;
     private final FriendsStorage friendsStorage;
 
     @Autowired
     public UserService(@Qualifier( "userDbStorage") UserStorage userStorage, FriendsStorage friendsStorage) {
-        this.userStorage = userStorage;
+        this.abstractStorage = userStorage;
         this.friendsStorage = friendsStorage;
     }
 
     @Override
     public void validate(User user) {
+        log.info("User id = {}", user.getId());
         if (user.getName() == null || user.getName().isBlank()) {
             log.info("имя для отображения пустое — используем использован логин : {}", user.getLogin());
             user.setName(user.getLogin());

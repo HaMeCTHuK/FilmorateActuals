@@ -19,14 +19,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping
-    @ResponseBody
-    public List<User> getAllUsers() {
-        List<User> allUsers = userService.getAll();
-        log.info("Текущее количество пользователей: {}", allUsers.size());
-        return  allUsers;
-    }
-
     @PostMapping
     public User createUser(@RequestBody @Valid User user) {
         log.info("Пытаемся добавить пользователя: {}", user);
@@ -43,6 +35,14 @@ public class UserController {
     public User getUser(@RequestBody @PathVariable Long id) {
         log.info("Получаем объект по id: {}", id);
         return userService.getData(id);
+    }
+
+    @GetMapping
+    @ResponseBody
+    public List<User> getAllUsers() {
+        List<User> allUsers = userService.getAll();
+        log.info("Текущее количество пользователей: {}", allUsers.size());
+        return  allUsers;
     }
 
     // PUT /users/{id}/friends/{friendId} — добавление в друзья.

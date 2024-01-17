@@ -11,18 +11,17 @@ import java.util.List;
 @Slf4j
 public class GenreService extends AbstractService<Genre> {
 
-    private final GenreStorage genreStorage;
-
-    public GenreService(GenreStorage genreStorage) {     //через  австракт сервис к хранилищу storage
-        this.genreStorage = genreStorage;
+    @Autowired
+    public GenreService(GenreStorage genreStorage) {
+        this.abstractStorage = genreStorage;
     }
 
-    public List<Genre> getAllGenres() {       //Для InMemory
-        return genreStorage.getAll();
+    public List<Genre> getAllGenres() {
+        return abstractStorage.getAll();
     }
 
-    public Genre getGenre(long id) {          //Для InMemory
-        return genreStorage.get(id);
+    public Genre getGenre(long id) {
+        return abstractStorage.get(id);
     }
 
     @Override
