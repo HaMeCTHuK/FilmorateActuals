@@ -24,23 +24,7 @@ public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-/*    // Метод для создания нового пользователя в базе данных
-    @Override
-    public User create(User user) {
-        log.info("Отправляем данные для создания USER в таблице");
-        String sql = "INSERT INTO USERS (email, login, name, birthday) VALUES (?, ?, ?, ?)";
-        int result = jdbcTemplate.update(sql, getParameters(user));
-
-        if (result != 1) {
-            log.info("Пользователь не создан.");
-            throw new IncorrectParameterException("Пользователь не создан.");
-        }  else {
-            ++generatedId;
-            User createdUser = get(generatedId);
-            log.info("Добавлен пользователь: {} {}", createdUser.getId(), createdUser.getEmail());
-            return createdUser;
-        }
-    }*/
+    // Метод для создания нового пользователя в базе данных
     @Override
     public User create(User user) {
         log.info("Отправляем данные для создания USER в таблице");

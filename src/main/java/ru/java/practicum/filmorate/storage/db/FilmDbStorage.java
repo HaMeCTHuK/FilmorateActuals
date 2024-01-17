@@ -27,7 +27,7 @@ public class FilmDbStorage implements FilmStorage {
 
 
 // Метод для добавления нового фильма
-    @Override
+  /*  @Override
     public Film create(Film film) {
         log.info("Отправляем данные для создания FILM в таблице");
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
@@ -41,15 +41,45 @@ public class FilmDbStorage implements FilmStorage {
         Mpa mpa = getMpaRating(film.getMpa());  // Получаем MPA из базы данных
         film.getMpa().setRatingName(mpa.getRatingName());  // Устанавливаем имя рейтинга MPA в объекте Film
 
+        List<Genre> genres = getGenresForFilm(film.getId());  //// Получаем Genres
+        film.setGenres(genres); //// Устанавливаем genres из базы данных
+
+
         log.info("Добавлен объект: " + film);
 
         return film;
-    }
+    }*/
+@Override
+public Film create(Film film) {
+    log.info("Отправляем данные для создания FILM в таблице");
+    SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
+            .withTableName("FILMS")
+            .usingGeneratedKeyColumns("id");
+
+    Number filmId = simpleJdbcInsert.executeAndReturnKey(getParams(film)); // Получаем id из таблицы при создании
+    film.setId(filmId.intValue());
+
+    // Добавляем информацию о жанрах в таблицу FILM_GENRE
+    addGenresForFilm((long) filmId.intValue(), film.getGenres());
+
+    Mpa mpa = getMpaRating(film.getMpa());  // Получаем MPA из базы данных
+    film.getMpa().setRatingName(mpa.getRatingName());  // Устанавливаем имя рейтинга MPA в объекте Film
+
+    List<Genre> genres = getGenresForFilm(film.getId());  // Получаем Genres
+    film.setGenres(genres); // Устанавливаем genres из базы данных
+
+
+
+    log.info("Добавлен объект: " + film);
+
+    return film;
+}
 
     // Метод для обновления существующего фильма
     @Override
     public Film update(Film film) {
         film.setMpa(getMpaRatingById(film.getMpa().getId()));
+        //film.setGenres(getGenresForFilm(film.getId()));   //
         String sql = "UPDATE FILMS " +
                 "SET NAME=?, " +
                 "DESCRIPTION=?, " +
@@ -106,6 +136,13 @@ public class FilmDbStorage implements FilmStorage {
 
         SqlRowSet resultSet = jdbcTemplate.queryForRowSet(sql, id);
 
+        List<Genre> genres = new ArrayList<>();
+        if (!getGenres(id).isEmpty()) {
+            genres = getGenres(id);
+        }
+
+
+
         if (resultSet.next()) {
             Film film = Film.builder()
                     .id(resultSet.getLong("id"))
@@ -120,11 +157,14 @@ public class FilmDbStorage implements FilmStorage {
                             .build())
                     .genres(Collections.singletonList(
                             Genre.builder()
-                                    .id(resultSet.getLong("genre_id"))
+                                    .id(resultSet.getLong("id"))
                                     .genreName(resultSet.getString("genre_name"))
                                     .build()
                     ))
                     .build();
+
+            film.setGenres(genres);
+
 
             log.info("Найден фильм: {} {}", film.getId(), film.getName());
 
@@ -202,7 +242,8 @@ public class FilmDbStorage implements FilmStorage {
                 "release_date", film.getReleaseDate().toString(),
                 "duration", film.getDuration(),
                 "rating", film.getRating(),
-                "mpa_rating_id", film.getMpa().getId()  // Используем id MPA
+                "mpa_rating_id", film.getMpa().getId(),
+                "genres", film.getGenres()
 
         );
         return params;
@@ -262,12 +303,41 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Mpa getMpaRating(Mpa mpa) {
         String sqlQuery = "SELECT * FROM MPARating WHERE id = ?";
-        List<Mpa> genres = jdbcTemplate.query(sqlQuery, MpaDbStorage::createMpa, mpa.getId());
-        if (genres.size() != 1) {
+        List<Mpa> mpas = jdbcTemplate.query(sqlQuery, MpaDbStorage::createMpa, mpa.getId());
+        if (mpas.size() != 1) {
             throw new DataNotFoundException("При получении MPA по id список не равен 1");
         }
-        return genres.get(0);
+        return mpas.get(0);
     }
+
+
+    public List<Genre> getGenres(Long filmId) {
+        String sqlQuery = "SELECT g.*," +
+                "FROM FILM_GENRE fg " +
+                "JOIN GENRES g ON fg.genre_id = g.id " +
+                "WHERE fg.film_id = ?;";
+        //List<Genre> genres = jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenre, filmId);
+        List<Genre> genres = jdbcTemplate.queryForList(sqlQuery, Genre.class,filmId);
+        if (genres.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return genres;
+    }
+
+    // Метод для получения информации о GENRE по его идентификатору
+    private List<Genre> getGenresForFilm(Long filmId) {
+        String genresSql = "SELECT g.id as genre_id, g.genre_name " +
+                "FROM FILM_GENRE fg " +
+                "JOIN GENRES g ON fg.genre_id = g.id " +
+                "WHERE fg.film_id = ?";
+        try {
+            return jdbcTemplate.query(genresSql, FilmDbStorage::createGenre, filmId);
+        } catch (DataNotFoundException e) {
+            // Если жанров нет, возвращаем пустой список
+            return Collections.emptyList();
+        }
+    }
+
 
     // Вспомогательный метод для получения информации о MPA рейтинге по его идентификатору
     private Mpa getMpaRatingById(long mpaRatingId) {
@@ -289,5 +359,15 @@ public class FilmDbStorage implements FilmStorage {
                 .id(rs.getLong("mpa_rating_id"))
                 .ratingName(rs.getString("mpa_rating_name"))
                 .build();
+    }
+
+    // Метод для добавления информации о жанрах в таблицу FILM_GENRE
+    private void addGenresForFilm(Long filmId, List<Genre> genres) {
+        if (genres != null && !genres.isEmpty()) {
+            for (Genre genre : genres) {
+                jdbcTemplate.update("INSERT INTO FILM_GENRE (film_id, genre_id) VALUES (?, ?)", filmId, genre.getId());
+
+            }
+        }
     }
 }

@@ -153,6 +153,7 @@ public class LikesDbStorage implements LikesStorage {
                 .genreName(rs.getString("genre_name"))
                 .build();
     }*/
+    // Метод для получения списка фильмов с наибольшим количеством лайков
     @Override
     public List<Film> getPopularFilms(int count) {
         log.info("Отправляем запрос в БД для получения залайканых фильмов");
@@ -172,12 +173,6 @@ public class LikesDbStorage implements LikesStorage {
                 "LIMIT ?;";
 
         List<Film> films = jdbcTemplate.query(sql, LikesDbStorage::createFilmWithLikes, count);
-
-        // Добавляем информацию о жанрах и mpa
-        for (Film film : films) {
-            film.setGenres(getGenresForFilm(film.getId()));
-            film.setMpa(getMpaForFilm(film.getId()));
-        }
 
         return films;
     }
@@ -228,6 +223,11 @@ public class LikesDbStorage implements LikesStorage {
         log.info("Создаем объект Film после запроса к БД");
 
 
+        Mpa mpa = createMpa(rs, rowNum);
+
+        Long genreId = rs.getLong("genre_id");
+        Genre genre = genreId != 0 ? createGenre(rs, rowNum) : null;
+
 
         Film film = Film.builder()
                 .id(rs.getLong("id"))
@@ -237,6 +237,8 @@ public class LikesDbStorage implements LikesStorage {
                 .duration(rs.getInt("duration"))
                 .rating(rs.getInt("rating"))
                 .likes(rs.getLong("like_count"))
+                .mpa(mpa)
+                .genres(genre != null ? Collections.singletonList(genre) : Collections.emptyList())
                 .build();
 
 
