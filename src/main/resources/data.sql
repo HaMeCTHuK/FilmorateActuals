@@ -6,7 +6,7 @@ merge INTO MPARating (id,rating_name)
                    (5, 'NC-13');
 
 merge INTO GENRES (id,genre_name)
-            values (1, 'Comedy'),
+            values  (1, 'Comedy'),
                     (2, 'Drama'),
                     (3, 'Cartoon'),
                     (4, 'Thriller'),

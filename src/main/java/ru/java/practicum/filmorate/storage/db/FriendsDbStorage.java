@@ -3,11 +3,13 @@ package ru.java.practicum.filmorate.storage.db;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.model.User;
 import ru.java.practicum.filmorate.storage.FriendsStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -19,8 +21,17 @@ public class FriendsDbStorage implements FriendsStorage {
     // Метод для получения списка всех друзей пользователя
     @Override
     public List<User> getAllFriends(Long userId) {
-        String sqlQuery = "SELECT * FROM FRIENDS WHERE user_id = ?";
-        return jdbcTemplate.query(sqlQuery, FriendsDbStorage::createUser, userId);
+        String sql = "SELECT F.friend_id, U.* " +
+                "FROM FRIENDS F " +
+                "JOIN USERS U ON F.friend_id = U.id " +
+                "WHERE F.user_id = ?";
+
+        try {
+            return jdbcTemplate.query(sql, FriendsDbStorage::createUser, userId);
+        } catch (DataNotFoundException e) {
+            // Если друзей нет, возвращаем пустой список
+            return Collections.emptyList();
+        }
     }
 
     // Метод для добавления друга пользователю
@@ -30,6 +41,7 @@ public class FriendsDbStorage implements FriendsStorage {
         int affectedRows = jdbcTemplate.update(sqlQuery, userId, friendId);
         return affectedRows > 0;
     }
+
 
     // Метод для удаления друга у пользователя
     @Override
