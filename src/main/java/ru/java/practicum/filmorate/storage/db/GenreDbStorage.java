@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.model.Genre;
+import ru.java.practicum.filmorate.model.Mpa;
 import ru.java.practicum.filmorate.storage.GenreStorage;
 
 import java.sql.ResultSet;
@@ -48,5 +49,31 @@ public class GenreDbStorage implements GenreStorage {
                 .id(rs.getLong("id"))
                 .genreName(rs.getString("genre_name"))
                 .build();
+    }
+
+    @Override
+    // Метод для создания нового жанра GENRE в базе данных
+    public Genre create(Genre genre) {
+        String sql = "INSERT INTO GENRES (genre_name) VALUES (?)";
+        jdbcTemplate.update(sql, genre.getGenreName());
+        return get(genre.getId());
+    }
+
+    // Метод для обновления информации о GENRE в базе данных
+    @Override
+    public Genre update(Genre genre) {
+        String sql = "UPDATE GENRES SET genre_name = ? WHERE id = ?";
+        jdbcTemplate.update(sql, genre.getGenreName(), genre.getId());
+        return get(genre.getId());
+    }
+
+    // Метод для удаления GENRE по его идентификатору
+    @Override
+    public void delete(Long id) {
+        String sqlQuery = "DELETE FROM GENRES WHERE id = ?";
+        int affectedRows = jdbcTemplate.update(sqlQuery, id);
+        if (affectedRows != 1) {
+            throw new DataNotFoundException("При удалении GENRE по id количество удаленных строк не равно 1");
+        }
     }
 }

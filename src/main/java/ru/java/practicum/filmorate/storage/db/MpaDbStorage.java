@@ -1,29 +1,34 @@
 package ru.java.practicum.filmorate.storage.db;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
+import ru.java.practicum.filmorate.model.Genre;
 import ru.java.practicum.filmorate.model.Mpa;
 import ru.java.practicum.filmorate.storage.MpaStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class MpaDbStorage implements MpaStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
 
-   /* @Override
+    @Override
    // Метод для создания нового MPA рейтинга в базе данных
     public Mpa create(Mpa mpa) {
         String sql = "INSERT INTO MPARating (rating_name) VALUES (?)";
         jdbcTemplate.update(sql, mpa.getRatingName());
-        return get(mpa.getId());
+        return mpa;
     }
 
     // Метод для обновления информации о MPA рейтинге в базе данных
@@ -32,8 +37,9 @@ public class MpaDbStorage implements MpaStorage {
         String sql = "UPDATE MPARating SET rating_name = ? WHERE id = ?";
         jdbcTemplate.update(sql, mpa.getRatingName(), mpa.getId());
         return get(mpa.getId());
+    }
 
-            // Метод для удаления MPA рейтинга по его идентификатору
+    // Метод для удаления MPA рейтинга по его идентификатору
     @Override
     public void delete(Long id) {
         String sqlQuery = "DELETE FROM MPARating WHERE id = ?";
@@ -42,7 +48,6 @@ public class MpaDbStorage implements MpaStorage {
             throw new DataNotFoundException("При удалении MPA по id количество удаленных строк не равно 1");
         }
     }
-    }*/
 
     // Метод для получения списка всех MPA рейтингов
     @Override
@@ -55,11 +60,11 @@ public class MpaDbStorage implements MpaStorage {
     @Override
     public Mpa get(Long id) {
         String sqlQuery = "SELECT * FROM MPARating WHERE id = ?";
-        List<Mpa> genres = jdbcTemplate.query(sqlQuery, MpaDbStorage::createMpa, id);
-        if (genres.size() != 1) {
+        List<Mpa> mpas = jdbcTemplate.query(sqlQuery, MpaDbStorage::createMpa, id);
+        if (mpas.size() != 1) {
             throw new DataNotFoundException("При получении MPA по id список не равен 1");
         }
-        return genres.get(0);
+        return mpas.get(0);
     }
 
     // Вспомогательный метод для извлечения параметров MPA рейтинга из ResultSet

@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 import ru.java.practicum.filmorate.exception.ValidationException;
 import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.service.FilmService;
-import ru.java.practicum.filmorate.storage.memory.InMemoryFilmStorage;
-import ru.java.practicum.filmorate.storage.memory.InMemoryUserStorage;
 
 import javax.validation.Validation;
 import javax.validation.Validator;

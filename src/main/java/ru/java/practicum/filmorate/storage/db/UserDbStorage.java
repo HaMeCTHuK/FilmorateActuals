@@ -2,14 +2,20 @@ package ru.java.practicum.filmorate.storage.db;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
+import ru.java.practicum.filmorate.exception.DataNotFoundException;
+import ru.java.practicum.filmorate.exception.IncorrectParameterException;
 import ru.java.practicum.filmorate.model.User;
 import ru.java.practicum.filmorate.storage.UserStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -18,46 +24,34 @@ public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
- /*   // Метод для получения списка всех друзей пользователя
-    @Override
-    public List<User> getAllFriends(Long userId) {
-        String sqlQuery = "SELECT * FROM FRIENDS WHERE user_id = ?";
-        return jdbcTemplate.query(sqlQuery, UserDbStorage::createUser, userId);
-    }
-
-    // Метод для добавления друга пользователю
-    @Override
-    public boolean addFriend(Long userId, Long friendId) {
-        String sqlQuery = "INSERT INTO FRIENDS (user_id, friend_id) VALUES (?, ?)";
-        int affectedRows = jdbcTemplate.update(sqlQuery, userId, friendId);
-        return affectedRows > 0;
-    }
-
-    // Метод для удаления друга пользователя
-    @Override
-    public boolean deleteFriend(Long userId, Long friendId) {
-        String sqlQuery = "DELETE FROM FRIENDS WHERE user_id = ? AND friend_id = ?";
-        int affectedRows = jdbcTemplate.update(sqlQuery, userId, friendId);
-        return affectedRows > 0;
-    }
-
-     // Метод для получения списка общих друзей двух пользователей
-    public List<User> getCommonFriends(Long userId, Long friendId) {
-        String sqlQuery = "SELECT u.* FROM USERS u " +
-                "JOIN FRIENDS f1 ON u.id = f1.friend_id " +
-                "JOIN FRIENDS f2 ON u.id = f2.friend_id " +
-                "WHERE f1.user_id = ? AND f2.user_id = ?";
-
-        return jdbcTemplate.query(sqlQuery, UserDbStorage::createUser, userId, friendId);
-    }
-    */
-
-    // Метод для создания нового пользователя в базе данных
+/*    // Метод для создания нового пользователя в базе данных
     @Override
     public User create(User user) {
+        log.info("Отправляем данные для создания USER в таблице");
         String sql = "INSERT INTO USERS (email, login, name, birthday) VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(sql, getParameters(user));
-        log.info("Добавлен объект: " + user);
+        int result = jdbcTemplate.update(sql, getParameters(user));
+
+        if (result != 1) {
+            log.info("Пользователь не создан.");
+            throw new IncorrectParameterException("Пользователь не создан.");
+        }  else {
+            ++generatedId;
+            User createdUser = get(generatedId);
+            log.info("Добавлен пользователь: {} {}", createdUser.getId(), createdUser.getEmail());
+            return createdUser;
+        }
+    }*/
+    @Override
+    public User create(User user) {
+        log.info("Отправляем данные для создания USER в таблице");
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
+                .withTableName("USERS")
+                .usingGeneratedKeyColumns("id");
+
+        Number id = simpleJdbcInsert.executeAndReturnKey(getParams(user));
+
+        user.setId(id.intValue());
+        log.info("Добавлен пользователь: {} {}", user.getId(), user.getEmail());
         return user;
     }
 
@@ -65,7 +59,11 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User update(User user) {
         String sql = "UPDATE USERS SET email=?, login=?, name=?, birthday=? WHERE id=?";
-        jdbcTemplate.update(sql, getParameters(user));
+        try {
+            jdbcTemplate.update(sql, getParametersWithId(user));
+        } catch (EmptyResultDataAccessException ex) {
+            throw new DataNotFoundException("Данные о пользователе не найдены");
+        }
         log.info("Обновлен объект: " + user);
         return user;
     }
@@ -81,7 +79,11 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User get(Long id) {
         String sql = "SELECT * FROM USERS WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, UserDbStorage::createUser, id);
+        try {
+            return jdbcTemplate.queryForObject(sql, UserDbStorage::createUser, id);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new DataNotFoundException("Данные о пользователе не найдены");
+        }
     }
 
     // Метод для удаления пользователя по его идентификатору
@@ -89,12 +91,7 @@ public class UserDbStorage implements UserStorage {
     public void delete(Long id) {
         String sql = "DELETE FROM USERS WHERE id = ?";
         jdbcTemplate.update(sql, id);
-        log.info("Удален объект с id=" + id);
-    }
-
-    // Вспомогательный метод для извлечения параметров пользователя из ResultSet
-    protected Object[] getParameters(User user) {
-        return new Object[]{user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId()};
+        log.info("Удален объект с id= " + id);
     }
 
     // Вспомогательный метод для создания объекта пользователя из ResultSet
@@ -107,4 +104,21 @@ public class UserDbStorage implements UserStorage {
                 .birthday(rs.getDate("birthday").toLocalDate())
                 .build();
     }
+
+    // Вспомогательный метод для извлечения параметров пользователя из ResultSet без id
+    private static Map<String, String> getParams(User user) {
+
+        Map<String, String> params = Map.of(
+                "email", user.getEmail(),
+                "login", user.getLogin(),
+                "name", user.getName(),
+                "birthday", user.getBirthday().toString());
+        return params;
+    }
+
+    // Вспомогательный метод для извлечения параметров пользователя из ResultSet c id
+    protected Object[] getParametersWithId(User user) {
+        return new Object[]{user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId()};
+    }
+
 }

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.java.practicum.filmorate.model.User;
 import ru.java.practicum.filmorate.service.UserService;
-import ru.java.practicum.filmorate.storage.memory.InMemoryUserStorage;
 
 import javax.validation.Validation;
 import javax.validation.Validator;

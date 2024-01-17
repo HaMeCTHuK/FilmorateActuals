@@ -1,15 +1,19 @@
 package ru.java.practicum.filmorate.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import net.bytebuddy.implementation.bind.annotation.Default;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 
 @Data
@@ -29,10 +33,23 @@ public class Film extends BaseUnit {
     private int duration;
     private int rating;
     @NotNull
-    private int mpaRatingId;
+    private Mpa mpa;
+    @NotNull
+    private List<Genre> genres = new ArrayList<>();
+    @JsonIgnore
+    private Long likes; //для лайков
 
 
 /*
+
+    @JsonIgnore
+    private List<Long> likes = new ArrayList<>(); //для лайков
+
+    public void setLikeCount(Long likeCount) {
+        if (likeCount != null) {
+            likes.add(likeCount);
+        }
+    }
 
 
     private HashSet<Long> likes = new HashSet<>(); //для лайков

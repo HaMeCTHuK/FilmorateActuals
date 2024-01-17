@@ -11,18 +11,17 @@ import java.util.List;
 @Slf4j
 public class MpaService extends AbstractService<Mpa> {
 
-    private final MpaStorage mpaStorage;
 
     public MpaService(MpaStorage mpaStorage) {
-        this.mpaStorage = mpaStorage;
+        this.abstractStorage = mpaStorage;
     }
 
     public List<Mpa> getAllMpa() {
-        return mpaStorage.getAll();
+        return abstractStorage.getAll();
     }
 
     public Mpa getMpa(long id) {
-        return mpaStorage.get(id);
+        return abstractStorage.get(id);
     }
 
     @Override

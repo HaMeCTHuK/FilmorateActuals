@@ -4,6 +4,12 @@ CREATE TABLE IF NOT EXISTS MPARating
   rating_name   VARCHAR(255)
 );
 
+CREATE TABLE IF NOT EXISTS GENRES
+(
+  id            INT NOT NULL PRIMARY KEY,
+  genre_name    VARCHAR(255)
+);
+
 CREATE TABLE IF NOT EXISTS FILMS
 (
   id            INT PRIMARY KEY auto_increment,
@@ -11,8 +17,15 @@ CREATE TABLE IF NOT EXISTS FILMS
   description   VARCHAR(255),
   release_date  DATE,
   duration      INT,
-  rating        INT,
+  rating        INT default 0,
   mpa_rating_id INT REFERENCES MPARating(id)
+);
+
+CREATE TABLE IF NOT EXISTS FILM_GENRE
+(
+  id            INT NOT NULL PRIMARY KEY auto_increment,
+  film_id       INT REFERENCES FILMS(id),
+  genre_id      INT REFERENCES GENRES(id)
 );
 
 CREATE TABLE IF NOT EXISTS USERS
@@ -21,8 +34,7 @@ CREATE TABLE IF NOT EXISTS USERS
   email         VARCHAR(255) NOT NULL UNIQUE,
   login         VARCHAR(255)NOT NULL UNIQUE,
   name          VARCHAR(255),
-  birthday      DATE,
-  deleted bool  default false
+  birthday      DATE
 );
 
 CREATE TABLE IF NOT EXISTS LIKES
@@ -37,18 +49,8 @@ CREATE TABLE IF NOT EXISTS FRIENDS
   friend_id     INT NOT NULL REFERENCES USERS(id)
 );
 
-CREATE TABLE IF NOT EXISTS GENRES
-(
-  id            INT NOT NULL PRIMARY KEY,
-  genre_name    VARCHAR(255)
-);
 
-CREATE TABLE IF NOT EXISTS FILM_GENRE
-(
-  id            INT NOT NULL PRIMARY KEY auto_increment,
-  film_id       INT REFERENCES FILMS(id),
-  genre_id      INT REFERENCES GENRES(id)
-);
+
 
 
 

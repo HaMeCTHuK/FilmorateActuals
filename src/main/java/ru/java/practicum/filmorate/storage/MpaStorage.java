@@ -1,11 +1,12 @@
 package ru.java.practicum.filmorate.storage;
 
+import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.model.Genre;
 import ru.java.practicum.filmorate.model.Mpa;
 
 import java.util.List;
 
-public interface MpaStorage  {
+public interface MpaStorage extends AbstractStorage<Mpa> {
 
     List<Mpa> getAll();
 
