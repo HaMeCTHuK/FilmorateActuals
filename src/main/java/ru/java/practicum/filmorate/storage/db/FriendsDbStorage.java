@@ -53,12 +53,14 @@ public class FriendsDbStorage implements FriendsStorage {
         String sqlQuery = "DELETE FROM FRIENDS WHERE user_id = ? AND friend_id = ?";
         int affectedRows = jdbcTemplate.update(sqlQuery, userId, friendId);
 
-        jdbcTemplate.update("UPDATE FRIENDS SET friendship = 'unconfirmed' WHERE user_id = ? AND friend_id = ?", friendId , userId);
+        jdbcTemplate.update("UPDATE FRIENDS" +
+                " SET friendship = 'unconfirmed' WHERE user_id = ? AND friend_id = ?", friendId , userId);
 
         return affectedRows > 0;
     }
 
     // Метод для получения общих друзей у двух пользователей
+    @Override
     public List<User> getCommonFriends(Long userId, Long friendId) {
         String sqlQuery = "SELECT u.* FROM USERS u " +
                 "JOIN FRIENDS f1 ON u.id = f1.friend_id " +
@@ -81,10 +83,9 @@ public class FriendsDbStorage implements FriendsStorage {
 
     // Вспомогательный метод для проверки взаимной дружбы
     private boolean checkAndSetFriendship(Long userId, Long friendId) {
-        String sqlQuery = "SELECT COUNT(*) " +
-                "FROM FRIENDS " +
-                "WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?) " +
-                "GROUP BY user_id, friend_id";
+        String sqlQuery = "SELECT " +
+                "SUM(CASE WHEN user_id = ? AND friend_id = ? OR user_id = ? AND friend_id = ? THEN 1 ELSE 0 END) " +
+                "FROM FRIENDS";
         Integer count = jdbcTemplate.queryForObject(sqlQuery, Integer.class, userId, friendId, friendId, userId);
 
         if (count == null) {
@@ -93,13 +94,28 @@ public class FriendsDbStorage implements FriendsStorage {
 
         if (count == 2) {
             // Обновление статуса friendship на "confirmed"
-            jdbcTemplate.update("UPDATE FRIENDS SET friendship = 'confirmed' WHERE user_id = ? AND friend_id = ?", userId, friendId);
-            jdbcTemplate.update("UPDATE FRIENDS SET friendship = 'confirmed' WHERE user_id = ? AND friend_id = ?", friendId, userId);
+            jdbcTemplate.update("UPDATE FRIENDS" +
+                    " SET friendship = 'confirmed' WHERE user_id = ? AND friend_id = ?", userId, friendId);
+            jdbcTemplate.update("UPDATE FRIENDS" +
+                    " SET friendship = 'confirmed' WHERE user_id = ? AND friend_id = ?", friendId, userId);
         } else {
             // Вставка новой записи с friendship по умолчанию "unconfirmed"
-            jdbcTemplate.update("UPDATE FRIENDS SET friendship = 'unconfirmed' WHERE user_id = ? AND friend_id = ?", userId, friendId);
+            jdbcTemplate.update("UPDATE FRIENDS" +
+                    " SET friendship = 'unconfirmed' WHERE user_id = ? AND friend_id = ?", userId, friendId);
         }
 
         return count == 2;
+    }
+
+    //Метод для получения статуса дружбы
+    public String getFriendshipStatus(Long userId, Long friendId) {
+        String sqlQuery = "SELECT friendship " +
+                "FROM friends " +
+                "WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)";
+
+        List<String> friendshipStatusList = jdbcTemplate.queryForList(sqlQuery, String.class, userId, friendId, friendId, userId);
+
+            return friendshipStatusList.get(0);
+
     }
 }

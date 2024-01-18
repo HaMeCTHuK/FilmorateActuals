@@ -15,8 +15,4 @@ public class Mpa extends BaseUnit {
     @NotBlank
     String name;
 
-    public Mpa(Long id, String name) {
-        super();
-        this.name = name;
-    }
 }

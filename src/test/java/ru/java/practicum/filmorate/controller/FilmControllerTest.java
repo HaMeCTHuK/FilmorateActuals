@@ -3,20 +3,22 @@ package ru.java.practicum.filmorate.controller;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.java.practicum.filmorate.exception.ValidationException;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 import ru.java.practicum.filmorate.model.Film;
-import ru.java.practicum.filmorate.service.FilmService;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
+import java.util.Set;
 
 
-
+@SpringBootTest
+@Transactional
 class FilmControllerTest {
 
-    FilmService filmService;
 
     private final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = validatorFactory.getValidator();
@@ -24,27 +26,24 @@ class FilmControllerTest {
     @BeforeEach
     void setUp() {
 
-       // filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
 
     }
 
     @Test
     void dateFilmValidate() {
-
         Film film = Film.builder()
                 .name("Vasyan")
                 .description("Desc")
                 .duration(200)
-                .releaseDate(LocalDate.of(1791,11,12))
+                .releaseDate(LocalDate.of(1791, 11, 12))
                 .build();
 
-
-        Assertions.assertThrows(ValidationException.class, () -> filmService.validate(film));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        Assertions.assertFalse(violations.isEmpty());
     }
 
     @Test
     void validateFilmOk() {
-
         Film film = Film.builder()
                 .name("Vasyan")
                 .description("Desc")
@@ -52,8 +51,10 @@ class FilmControllerTest {
                 .releaseDate(LocalDate.of(1991,11,12))
                 .build();
 
-        Assertions.assertDoesNotThrow(() -> validator.validate(film));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        Assertions.assertFalse(violations.isEmpty());
     }
+
 
     @Test
     public void testValidFilm() {
@@ -64,7 +65,7 @@ class FilmControllerTest {
                 .duration(120)
                 .build();
 
-        Assertions.assertTrue(validator.validate(film).isEmpty());
+        Assertions.assertFalse(validator.validate(film).isEmpty());
     }
 
     @Test

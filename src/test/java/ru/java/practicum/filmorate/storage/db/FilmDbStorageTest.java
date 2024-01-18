@@ -24,15 +24,16 @@ class FilmDbStorageTest {
     @Test
     void testCreateFilm() {
         // Подготавливаем данные для теста
-
-
         Film newFilm = new Film(
                 "testFilm",
                 "description",
                 LocalDate.of(1999,2,2),
                 150,
                 1,
+                new Mpa(),
                 10L);
+
+        newFilm.getMpa().setId(1);
 
         // Записываем фильм в базу данных
         FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
@@ -48,16 +49,19 @@ class FilmDbStorageTest {
     @Test
     void testUpdateFilm() {
         // Подготавливаем данные для теста
+
+
         Film newFilm = new Film(
                 "testFilm2",
                 "description2",
                 LocalDate.of(1999,2,22),
                 100,
                 0,
+                new Mpa(),
                 10L);
 
 
-
+        newFilm.getMpa().setId(2);
 
         // Записываем фильм в базу данных
         FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
@@ -71,8 +75,7 @@ class FilmDbStorageTest {
         createdFilm.setRating(4);
 
         //Устанавливаем MPA
-        newFilm.getMpa().setId(1);
-        newFilm.getMpa().setName("PG");
+        newFilm.getMpa().setId(4);
 
         // Обновляем фильм в базе данных
         Film updatedFilm = filmStorage.update(createdFilm);
@@ -86,12 +89,15 @@ class FilmDbStorageTest {
     @Test
     void testGetFilm() {
         // Подготавливаем данные для теста
-        Film newFilm = new Film();
-        newFilm.setName("Test Film");
-        newFilm.setDescription("Test Description");
-        newFilm.setReleaseDate(LocalDate.now());
-        newFilm.setDuration(120);
-        newFilm.setRating(5);
+        Film newFilm = new Film(
+                "testFilm3",
+                "description3",
+                LocalDate.of(1999,2,23),
+                90,
+                1,
+                new Mpa(),
+                10L);
+        newFilm.getMpa().setId(3);
 
         // Записываем фильм в базу данных
         FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
@@ -110,12 +116,15 @@ class FilmDbStorageTest {
     @Test
     void testDeleteFilm() {
         // Подготавливаем данные для теста
-        Film newFilm = new Film();
-        newFilm.setName("Test Film");
-        newFilm.setDescription("Test Description");
-        newFilm.setReleaseDate(LocalDate.now());
-        newFilm.setDuration(120);
-        newFilm.setRating(5);
+        Film newFilm = new Film(
+                "testFilm4",
+                "description4",
+                LocalDate.of(1999,2,24),
+                40,
+                1,
+                new Mpa(),
+                10L);
+        newFilm.getMpa().setId(5);
 
         // Записываем фильм в базу данных
         FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);

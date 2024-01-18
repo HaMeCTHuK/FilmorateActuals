@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @JdbcTest // указываем, о необходимости подготовить бины для работы с БД
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserDbStorageTest {
+
     private final JdbcTemplate jdbcTemplate;
 
     @Test
@@ -98,7 +99,11 @@ class UserDbStorageTest {
     @Test
     void testDeleteUser() {
         // Подготавливаем данные для теста
-        User newUser = new User("user@email.ru", "vanya123", "Ivan Petrov", LocalDate.of(1990, 1, 1));
+        User newUser = new User(
+                "user@email.ru",
+                "vanya123",
+                "Ivan Petrov",
+                LocalDate.of(1990, 1, 1));
         UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
         User savedUser = userStorage.create(newUser);
 
