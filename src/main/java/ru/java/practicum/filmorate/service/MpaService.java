@@ -11,7 +11,6 @@ import java.util.List;
 @Slf4j
 public class MpaService extends AbstractService<Mpa> {
 
-
     public MpaService(MpaStorage mpaStorage) {
         this.abstractStorage = mpaStorage;
     }
