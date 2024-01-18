@@ -95,7 +95,7 @@ public class LikesDbStorage implements LikesStorage {
     public static Genre createGenre(ResultSet rs, int rowNum) throws SQLException {
         return Genre.builder()
                 .id(rs.getLong("genre_id"))
-                .genreName(rs.getString("genre_name"))
+                .name(rs.getString("genre_name"))
                 .build();
     }
 
@@ -103,7 +103,7 @@ public class LikesDbStorage implements LikesStorage {
     public static Mpa createMpa(ResultSet rs, int rowNum) throws SQLException {
         return Mpa.builder()
                 .id(rs.getLong("mpa_rating_id"))
-                .ratingName(rs.getString("mpa_rating_name"))
+                .name(rs.getString("mpa_rating_name"))
                 .build();
     }
 

@@ -40,14 +40,14 @@ public class GenreDbStorage implements GenreStorage {
 
     // Вспомогательный метод для извлечения параметров жанра из ResultSet
     protected Object[] getParameters(Genre data) {
-        return new Object[]{data.getId(), data.getGenreName()};
+        return new Object[]{data.getId(), data.getName()};
     }
 
     // Вспомогательный метод для создания объекта Genre из ResultSet
     static Genre createGenre(ResultSet rs, int rowNum) throws SQLException {
         return Genre.builder()
                 .id(rs.getLong("id"))
-                .genreName(rs.getString("genre_name"))
+                .name(rs.getString("genre_name"))
                 .build();
     }
 
@@ -55,7 +55,7 @@ public class GenreDbStorage implements GenreStorage {
     // Метод для создания нового жанра GENRE в базе данных
     public Genre create(Genre genre) {
         String sql = "INSERT INTO GENRES (genre_name) VALUES (?)";
-        jdbcTemplate.update(sql, genre.getGenreName());
+        jdbcTemplate.update(sql, genre.getName());
         return get(genre.getId());
     }
 
@@ -63,7 +63,7 @@ public class GenreDbStorage implements GenreStorage {
     @Override
     public Genre update(Genre genre) {
         String sql = "UPDATE GENRES SET genre_name = ? WHERE id = ?";
-        jdbcTemplate.update(sql, genre.getGenreName(), genre.getId());
+        jdbcTemplate.update(sql, genre.getName(), genre.getId());
         return get(genre.getId());
     }
 
