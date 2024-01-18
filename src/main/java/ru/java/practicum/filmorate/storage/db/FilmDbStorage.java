@@ -41,7 +41,7 @@ public class FilmDbStorage implements FilmStorage {
         addGenresForFilm((long) filmId.intValue(), film.getGenres());
 
         Mpa mpa = getMpaRating(film.getMpa());  // Получаем MPA из базы данных
-        film.getMpa().setRatingName(mpa.getRatingName());  // Устанавливаем имя рейтинга MPA в объекте Film
+        film.getMpa().setName(mpa.getName());  // Устанавливаем имя рейтинга MPA в объекте Film
 
         log.info("Добавлен объект: " + film);
 
@@ -126,12 +126,12 @@ public class FilmDbStorage implements FilmStorage {
                     .rating(resultSet.getInt("rating"))
                     .mpa(Mpa.builder()
                             .id(resultSet.getLong("mpa_rating_id"))
-                            .ratingName(resultSet.getString("rating_name"))
+                            .name(resultSet.getString("rating_name"))
                             .build())
                     .genres(Collections.singletonList(
                             Genre.builder()
                                     .id(resultSet.getLong("id"))
-                                    .genreName(resultSet.getString("genre_name"))
+                                    .name(resultSet.getString("genre_name"))
                                     .build()
                     ))
                     .build();
@@ -242,7 +242,7 @@ public class FilmDbStorage implements FilmStorage {
     public static Genre createGenre(ResultSet rs, int rowNum) throws SQLException {
         return Genre.builder()
                 .id(rs.getLong("genre_id"))
-                .genreName(rs.getString("genre_name"))
+                .name(rs.getString("genre_name"))
                 .build();
     }
 
@@ -250,7 +250,7 @@ public class FilmDbStorage implements FilmStorage {
     public static Mpa createMpa(ResultSet rs, int rowNum) throws SQLException {
         return Mpa.builder()
                 .id(rs.getLong("mpa_rating_id"))
-                .ratingName(rs.getString("mpa_rating_name"))
+                .name(rs.getString("mpa_rating_name"))
                 .build();
     }
 
