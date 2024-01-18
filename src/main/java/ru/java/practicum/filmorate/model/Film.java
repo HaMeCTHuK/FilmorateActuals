@@ -45,12 +45,14 @@ public class Film extends BaseUnit {
             LocalDate releaseDate,
             int duration,
             int rating,
+            Mpa mpa,
             Long likes) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.rating = rating;
+        this.mpa = mpa;
         this.likes = likes;
     }
 }

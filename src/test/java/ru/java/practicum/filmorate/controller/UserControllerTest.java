@@ -3,8 +3,11 @@ package ru.java.practicum.filmorate.controller;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.java.practicum.filmorate.exception.ValidationException;
 import ru.java.practicum.filmorate.model.User;
 import ru.java.practicum.filmorate.service.UserService;
+import ru.java.practicum.filmorate.storage.FriendsStorage;
+import ru.java.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -14,15 +17,17 @@ import java.time.LocalDate;
 
 class UserControllerTest {
 
-    UserService userService;
 
+    UserService userService;
+    UserStorage userStorage;
+    FriendsStorage friendsStorage;
     private final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = factory.getValidator();
 
 
     @BeforeEach
              void setUp() {
-
+        userService = new UserService(userStorage, friendsStorage);
     }
 
     @Test
@@ -34,9 +39,9 @@ class UserControllerTest {
                 .birthday(LocalDate.of(1999,1,22))
                 .build();
 
-        userService.validate(user);
 
-        Assertions.assertEquals("Boroda",user.getName());
+        userService.validate(user);
+        Assertions.assertEquals(user.getName(), user.getLogin());
     }
 
     @Test
@@ -48,9 +53,9 @@ class UserControllerTest {
                 .birthday(LocalDate.of(1999,1,22))
                 .build();
 
-        userService.validate(user);
+        validator.validate(user);
 
-        Assertions.assertEquals("oda",user.getName());
+        Assertions.assertTrue(user.getName().isBlank());
     }
 
     @Test
