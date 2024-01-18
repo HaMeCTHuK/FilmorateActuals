@@ -24,7 +24,7 @@ class FilmControllerTest {
     @BeforeEach
     void setUp() {
 
-       // filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());  Старая логика
+       // filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
 
     }
 

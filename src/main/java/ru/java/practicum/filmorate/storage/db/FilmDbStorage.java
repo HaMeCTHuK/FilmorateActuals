@@ -24,8 +24,6 @@ public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-
-
     // Метод для добавления нового фильма
     @Override
     public Film create(Film film) {
@@ -204,7 +202,6 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-
     // Метод для получения информации о MPA рейтинге по его идентификатору
     @Override
     public Mpa getMpaRating(Mpa mpa) {
@@ -215,7 +212,6 @@ public class FilmDbStorage implements FilmStorage {
         }
         return mpas.get(0);
     }
-
 
     // Метод для получения информации о GENRE по идентификатору фильма
     private List<Genre> getGenresForFilm(Long filmId) {
@@ -230,7 +226,6 @@ public class FilmDbStorage implements FilmStorage {
             return Collections.emptyList();
         }
     }
-
 
     // Вспомогательный метод для получения информации о MPA рейтинге по его идентификатору
     private Mpa getMpaRatingById(long mpaRatingId) {

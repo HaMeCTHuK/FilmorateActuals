@@ -37,7 +37,20 @@ public class Film extends BaseUnit {
     @NotNull
     private List<Genre> genres = new ArrayList<>();
     @JsonIgnore
-    private Long likes;
+    private Long likes = 0L;
 
-
+    public Film(
+            String name,
+            String description,
+            LocalDate releaseDate,
+            int duration,
+            int rating,
+            Long likes) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.rating = rating;
+        this.likes = likes;
+    }
 }

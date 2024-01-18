@@ -22,7 +22,7 @@ class UserControllerTest {
 
     @BeforeEach
              void setUp() {
-       // userService = new UserService(new InMemoryUserStorage());   старая логика
+
     }
 
     @Test
@@ -56,7 +56,7 @@ class UserControllerTest {
     @Test
     public void testEmailValidation() {
         User user = User.builder()
-                .email("invalidEmail")  // проверка на некорректный емаил
+                .email("invalidEmail")
                 .login("Login")
                 .name("totParen")
                 .birthday(LocalDate.now())
@@ -70,7 +70,7 @@ class UserControllerTest {
     public void testLoginNotBlank() {
         User user = User.builder()
                 .email("vlad@mamail.ru")
-                .login("")  // пустой логин
+                .login("")
                 .name("name")
                 .birthday(LocalDate.now())
                 .build();
@@ -84,7 +84,7 @@ class UserControllerTest {
                 .email("valera@boss.com")
                 .login("login")
                 .name("nameless")
-                .birthday(LocalDate.now().plusDays(1))  //дата из будущего
+                .birthday(LocalDate.now().plusDays(1))
                 .build();
 
         Assertions.assertFalse(validator.validate(user).isEmpty());
