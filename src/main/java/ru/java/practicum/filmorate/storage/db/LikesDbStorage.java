@@ -55,105 +55,6 @@ public class LikesDbStorage implements LikesStorage {
     }
 
     // Метод для получения списка фильмов с наибольшим количеством лайков
-/*    @Override
-    public List<Film> getPopularFilms(int count) {
-        String sql = "SELECT film_id FROM LIKES GROUP BY film_id ORDER BY COUNT(*) DESC LIMIT ?";
-        return jdbcTemplate.query(sql, LikesDbStorage::createFilm, count);
-    }*/
-
-    // Метод для получения списка фильмов с наибольшим количеством лайков
-/*    @Override
-    public List<Film> getPopularFilms(int count) {
-        log.info("Отправляем запрос в БД для получения залайканых фильмов");
-        String sql = "SELECT f.*, " +
-                            "m.rating_name AS mpa_rating_name, " +
-                            "g.genre_name, " +
-                            "fg.genre_id, " +
-                            "COUNT(l.film_id) AS like_count " +
-                     "FROM FILMS f " +
-                     "LEFT JOIN MPARating m ON f.mpa_rating_id = m.id " +
-                     "LEFT JOIN FILM_GENRE fg ON f.id = fg.film_id " +
-                     "LEFT JOIN GENRES g ON fg.genre_id = g.id " +
-                     "LEFT JOIN LIKES l ON f.id = l.film_id " +
-                     "GROUP BY f.id, m.rating_name, g.genre_name, fg.genre_id " +
-                     "ORDER BY like_count DESC " +
-                     "LIMIT ?;";
-        return jdbcTemplate.query(sql, LikesDbStorage::createFilmWithLikes, count);
-    }
-
-
-    // Вспомогательный метод для создания объекта Film из ResultSet
-    public static Film createFilm(ResultSet rs, int rowNum) throws SQLException {
-        Mpa mpa = Mpa.builder()
-                .id(rs.getLong("mpa_rating_id"))
-                .ratingName(rs.getString("mpa_rating_name"))
-                .build();
-
-        Genre genre = Genre.builder()
-                .id(rs.getLong("genre_id"))
-                .genreName(rs.getString("genre_name"))
-                .build();
-
-        return Film.builder()
-                .id(rs.getLong("id"))
-                .name(rs.getString("name"))
-                .description(rs.getString("description"))
-                .releaseDate(rs.getDate("release_date").toLocalDate())
-                .duration(rs.getInt("duration"))
-                .rating(rs.getInt("rating"))
-                .mpa(mpa)
-                .genres(Collections.singletonList(genre))
-                .build();
-    }
-
-    public static Film createFilmWithLikes(ResultSet rs, int rowNum) throws SQLException {
-        log.info("Создаем объект Film после запроса к БД");
-
-        Mpa mpa = createMpa(rs);
-        Genre genre = createGenre(rs);
-
-
-        Film film = Film.builder()
-                .id(rs.getLong("id"))
-                .name(rs.getString("name"))
-                .description(rs.getString("description"))
-                .releaseDate(rs.getDate("release_date").toLocalDate())
-                .duration(rs.getInt("duration"))
-                .rating(rs.getInt("rating"))
-                .mpa(mpa)
-                .genres(genre != null ? Collections.singletonList(genre) : Collections.emptyList())
-                .build();
-
-        return film;
-    }
-
-    private static Mpa createMpa(ResultSet rs) throws SQLException {
-        Long mpaId = rs.getLong("mpa_rating_id");
-
-        if (rs.wasNull()) {
-            return Mpa.builder().build(); // Возвращаем пустой объект, если mpa_rating_id был NULL
-
-        }
-
-        return Mpa.builder()
-                .id(mpaId)
-                .ratingName(rs.getString("mpa_rating_name"))
-                .build();
-    }
-
-    private static Genre createGenre(ResultSet rs) throws SQLException {
-        Long genreId = rs.getLong("genre_id");
-        if (rs.wasNull()) {
-            return Genre.builder().build(); // Возвращаем пустой объект, если genre_id был NULL
-
-        }
-
-        return Genre.builder()
-                .id(genreId)
-                .genreName(rs.getString("genre_name"))
-                .build();
-    }*/
-    // Метод для получения списка фильмов с наибольшим количеством лайков
     @Override
     public List<Film> getPopularFilms(int count) {
         log.info("Отправляем запрос в БД для получения залайканых фильмов");
@@ -198,19 +99,6 @@ public class LikesDbStorage implements LikesStorage {
                 .build();
     }
 
-    private Mpa getMpaForFilm(Long filmId) {
-        String mpaSql = "SELECT m.* " +
-                "FROM FILMS f " +
-                "JOIN MPARating m ON f.mpa_rating_id = m.id " +
-                "WHERE f.id = ?;";
-        try {
-            return jdbcTemplate.queryForObject(mpaSql, LikesDbStorage::createMpa, filmId);
-        } catch (DataNotFoundException e) {
-            // Если MPA нет, возвращаем null
-            return null;
-        }
-    }
-
     // Вспомогательный метод для создания объекта Mpa из ResultSet
     public static Mpa createMpa(ResultSet rs, int rowNum) throws SQLException {
         return Mpa.builder()
@@ -222,12 +110,10 @@ public class LikesDbStorage implements LikesStorage {
     public static Film createFilmWithLikes(ResultSet rs, int rowNum) throws SQLException {
         log.info("Создаем объект Film после запроса к БД");
 
-
         Mpa mpa = createMpa(rs, rowNum);
 
         Long genreId = rs.getLong("genre_id");
         Genre genre = genreId != 0 ? createGenre(rs, rowNum) : null;
-
 
         Film film = Film.builder()
                 .id(rs.getLong("id"))
@@ -240,8 +126,6 @@ public class LikesDbStorage implements LikesStorage {
                 .mpa(mpa)
                 .genres(genre != null ? Collections.singletonList(genre) : Collections.emptyList())
                 .build();
-
-
 
         return film;
     }

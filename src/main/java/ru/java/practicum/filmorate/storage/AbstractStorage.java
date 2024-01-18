@@ -1,8 +1,8 @@
 package ru.java.practicum.filmorate.storage;
 
 import ru.java.practicum.filmorate.model.BaseUnit;
+
 import java.util.List;
-import java.util.Optional;
 
 public interface AbstractStorage<T extends BaseUnit> {
 

@@ -26,53 +26,26 @@ public class FilmDbStorage implements FilmStorage {
 
 
 
-// Метод для добавления нового фильма
-  /*  @Override
+    // Метод для добавления нового фильма
+    @Override
     public Film create(Film film) {
         log.info("Отправляем данные для создания FILM в таблице");
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
-                .withTableName("FILMS")
-                .usingGeneratedKeyColumns("id");
+            .withTableName("FILMS")
+            .usingGeneratedKeyColumns("id");
 
-        Number id = simpleJdbcInsert.executeAndReturnKey(getParams(film)); //Получаем id из таблицы при создании
+        Number filmId = simpleJdbcInsert.executeAndReturnKey(getParams(film)); // Получаем id из таблицы при создании
+        film.setId(filmId.intValue());
 
-        film.setId(id.intValue());
+        // Добавляем информацию о жанрах в таблицу FILM_GENRE
+        addGenresForFilm((long) filmId.intValue(), film.getGenres());
 
         Mpa mpa = getMpaRating(film.getMpa());  // Получаем MPA из базы данных
         film.getMpa().setRatingName(mpa.getRatingName());  // Устанавливаем имя рейтинга MPA в объекте Film
 
-        List<Genre> genres = getGenresForFilm(film.getId());  //// Получаем Genres
-        film.setGenres(genres); //// Устанавливаем genres из базы данных
-
-
         log.info("Добавлен объект: " + film);
 
         return film;
-    }*/
-@Override
-public Film create(Film film) {
-    log.info("Отправляем данные для создания FILM в таблице");
-    SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
-            .withTableName("FILMS")
-            .usingGeneratedKeyColumns("id");
-
-    Number filmId = simpleJdbcInsert.executeAndReturnKey(getParams(film)); // Получаем id из таблицы при создании
-    film.setId(filmId.intValue());
-
-    // Добавляем информацию о жанрах в таблицу FILM_GENRE
-    addGenresForFilm((long) filmId.intValue(), film.getGenres());
-
-    Mpa mpa = getMpaRating(film.getMpa());  // Получаем MPA из базы данных
-    film.getMpa().setRatingName(mpa.getRatingName());  // Устанавливаем имя рейтинга MPA в объекте Film
-
-    //List<Genre> genres = getGenresForFilm(film.getId());  // Получаем Genres
-    //film.setGenres(genres); // Устанавливаем genres из базы данных
-
-
-
-    log.info("Добавлен объект: " + film);
-
-    return film;
 }
 
     // Метод для обновления существующего фильма
@@ -94,7 +67,6 @@ public Film create(Film film) {
         } catch (EmptyResultDataAccessException ex) {
             throw new DataNotFoundException("Данные о пользователе не найдены");
         }
-
 
         // Удаляем устаревшие жанры
         String deleteGenresSql = "DELETE FROM FILM_GENRE WHERE film_id = ?";
@@ -127,20 +99,6 @@ public Film create(Film film) {
         return jdbcTemplate.query(sql, FilmDbStorage::createFilm);
     }
 
-
-/*    // Метод для получения конкретного фильма по его идентификатору
-    @Override
-    public Film get(Long id) {
-        String sql = "SELECT f.*, m.rating_name AS mpa_rating_name " +
-                "FROM FILMS f " +
-                "LEFT JOIN MPARATING m ON f.mpa_rating_id = m.id WHERE f.id = ?";
-        try {
-            return jdbcTemplate.queryForObject(sql, FilmDbStorage::createFilm, id);
-        } catch (EmptyResultDataAccessException ex) {
-            throw new DataNotFoundException("Данные о фильме не найдены");
-        }
-    }*/
-
     // Метод для получения конкретного фильма по его идентификатору
     @Override
     public Film get(Long id) {
@@ -156,7 +114,6 @@ public Film create(Film film) {
         if (!getGenresForFilm(id).isEmpty()) {
             genres = getGenresForFilm(id);
         }
-
 
 
         if (resultSet.next()) {
@@ -199,45 +156,6 @@ public Film create(Film film) {
         log.info("Удален объект с id=" + id);
     }
 
-
-
- /*
- // Метод для получения списка идентификаторов фильмов, которые лайкнул пользователь
-    @Override
-    public List<Long> getAllFilmLikes(Long userId) {
-        String sqlQuery = "SELECT film_id FROM LIKES WHERE user_id = ?";
-        return jdbcTemplate.queryForList(sqlQuery, Long.class, userId);
-    }
-
-    // Метод для добавления лайка к фильму от пользователя
-    @Override
-    public boolean addLike(Long filmId, Long userId) {
-        String sqlQuery = "INSERT INTO LIKES (user_id, film_id) VALUES (?, ?)";
-        int affectedRows = jdbcTemplate.update(sqlQuery, userId, filmId);
-        return affectedRows > 0;
-    }
-
-    // Метод для удаления лайка к фильму от пользователя
-    @Override
-    public boolean deleteLike(Long filmId, Long userId) {
-        String sqlQuery = "DELETE FROM LIKES WHERE user_id = ? AND film_id = ?";
-        int affectedRows = jdbcTemplate.update(sqlQuery, userId, filmId);
-        return affectedRows > 0;
-    }
-
-    // Метод для получения списка популярных фильмов с заданным количеством
-    @Override
-    public List<Film> getPopularFilms(int count) {
-        String sqlQuery = "SELECT * FROM FILMS ORDER BY rating DESC LIMIT ?";
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::createFilm, count);
-    }*/
-
-    // Вспомогательный метод для извлечения параметров для SQL-запросов
-    protected Object[] getParameters(Film film) {
-        return new Object[]{film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(),
-                film.getRating(), film.getMpa()};
-    }
-
     // Вспомогательный метод для извлечения параметров для SQL-запросов с id
     protected Object[] getParametersWithId(Film film) {
         return new Object[]{
@@ -249,7 +167,7 @@ public Film create(Film film) {
                 film.getMpa() != null ? film.getMpa().getId() : null,
                 film.getId()};
     }
-
+    // Вспомогательный метод для извлечения параметров для SQL-запросов
     private static Map<String, Object> getParams(Film film) {
 
         Map<String, Object> params = Map.of(
@@ -265,37 +183,9 @@ public Film create(Film film) {
         return params;
     }
 
-    // Вспомогательный метод для создания объекта Film из ResultSet
-   /* public static Film createFilm(ResultSet rs, int rowNum) throws SQLException {
-        Mpa mpa = Mpa.builder()
-                .id(rs.getLong("mpa_rating_id"))
-                .ratingName(rs.getString("mpa_rating_name"))
-                .build();
-
-        Genre genre = Genre.builder()
-                .id(rs.getLong("genre_id"))
-                .genreName(rs.getString("genre_name"))
-                .build();
-
-        return Film.builder()
-                .id(rs.getLong("id"))
-                .name(rs.getString("name"))
-                .description(rs.getString("description"))
-                .releaseDate(rs.getDate("release_date").toLocalDate())
-                .duration(rs.getInt("duration"))
-                .rating(rs.getInt("rating"))
-                .mpa(mpa)
-                .genres(Collections.singletonList(genre))
-                .build();
-    }*/
+   // Вспомогательный метод для создания объекта Film из ResultSet
     public static Film createFilm(ResultSet rs, int rowNum) throws SQLException {
         Mpa mpa = createMpa(rs, rowNum);
-
-        /*Long genreId = rs.getLong("genre_id");
-        Genre genre = genreId != 0 ? Genre.builder()
-                .id(genreId)
-                .genreName(rs.getString("genre_name"))
-                .build() : null;*/
 
         Long genreId = rs.getLong("genre_id");
         Genre genre = genreId != 0 ? createGenre(rs, rowNum) : null;
@@ -324,20 +214,6 @@ public Film create(Film film) {
             throw new DataNotFoundException("При получении MPA по id список не равен 1");
         }
         return mpas.get(0);
-    }
-
-
-    public List<Genre> getGenres(Long filmId) {
-        String sqlQuery = "SELECT g.*" +
-                "FROM FILM_GENRE fg " +
-                "JOIN GENRES g ON fg.genre_id = g.id " +
-                "WHERE fg.film_id = ?;";
-        //List<Genre> genres = jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenre, filmId);
-        List<Genre> genres = jdbcTemplate.queryForList(sqlQuery, Genre.class, filmId);
-        if (genres.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return genres;
     }
 
 

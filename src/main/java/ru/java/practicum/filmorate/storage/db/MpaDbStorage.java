@@ -3,17 +3,14 @@ package ru.java.practicum.filmorate.storage.db;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
-import ru.java.practicum.filmorate.model.Genre;
 import ru.java.practicum.filmorate.model.Mpa;
 import ru.java.practicum.filmorate.storage.MpaStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -21,7 +18,6 @@ import java.util.Optional;
 public class MpaDbStorage implements MpaStorage {
 
     private final JdbcTemplate jdbcTemplate;
-
 
     @Override
    // Метод для создания нового MPA рейтинга в базе данных
