@@ -37,7 +37,8 @@ public class Film extends BaseUnit {
     @NotNull
     private List<Genre> genres = new ArrayList<>();
     @JsonIgnore
-    private Long likes; //для лайков
+    private Long likes;
+
 
 
 /*

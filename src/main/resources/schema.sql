@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS FILM_GENRE
 (
   id            INT NOT NULL PRIMARY KEY auto_increment,
   film_id       INT REFERENCES FILMS(id),
-  genre_id      INT REFERENCES GENRES(id)
+  genre_id      INT REFERENCES GENRES(id),
+  UNIQUE (film_id, genre_id)
 );
 
 CREATE TABLE IF NOT EXISTS USERS

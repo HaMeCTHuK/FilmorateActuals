@@ -19,7 +19,6 @@ import java.util.List;
 
 @Service
 @Slf4j
-
 public class FilmService extends AbstractService<Film> {
 
     private static final LocalDate LAST_RELEASE_DATE = LocalDate.of(1895, 12, 28);
@@ -29,9 +28,9 @@ public class FilmService extends AbstractService<Film> {
     private final LikesStorage likesStorage;
 
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
-                       @Qualifier( "userDbStorage") UserStorage userStorage,
-                       @Qualifier( "likesDbStorage") LikesStorage likesStorage) {
+    public FilmService(@Qualifier("filmDbStorage")  FilmStorage filmStorage,
+                                                    UserStorage userStorage,
+                                                    LikesStorage likesStorage) {
         this.abstractStorage = filmStorage;
         this.userStorage = userStorage;
         this.likesStorage = likesStorage;

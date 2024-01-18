@@ -65,8 +65,8 @@ public Film create(Film film) {
     Mpa mpa = getMpaRating(film.getMpa());  // Получаем MPA из базы данных
     film.getMpa().setRatingName(mpa.getRatingName());  // Устанавливаем имя рейтинга MPA в объекте Film
 
-    List<Genre> genres = getGenresForFilm(film.getId());  // Получаем Genres
-    film.setGenres(genres); // Устанавливаем genres из базы данных
+    //List<Genre> genres = getGenresForFilm(film.getId());  // Получаем Genres
+    //film.setGenres(genres); // Устанавливаем genres из базы данных
 
 
 
@@ -79,7 +79,6 @@ public Film create(Film film) {
     @Override
     public Film update(Film film) {
         film.setMpa(getMpaRatingById(film.getMpa().getId()));
-        //film.setGenres(getGenresForFilm(film.getId()));   //
         String sql = "UPDATE FILMS " +
                 "SET NAME=?, " +
                 "DESCRIPTION=?, " +
@@ -95,6 +94,23 @@ public Film create(Film film) {
         } catch (EmptyResultDataAccessException ex) {
             throw new DataNotFoundException("Данные о пользователе не найдены");
         }
+
+
+        // Удаляем устаревшие жанры
+        String deleteGenresSql = "DELETE FROM FILM_GENRE WHERE film_id = ?";
+        jdbcTemplate.update(deleteGenresSql, film.getId());
+
+        // Добавляем новые жанры (если они не дублируются)
+        Set<Long> existingGenreIds = new HashSet<>();
+        for (Genre genre : film.getGenres()) {
+            if (!existingGenreIds.contains(genre.getId())) {
+                existingGenreIds.add(genre.getId());
+                jdbcTemplate.update("INSERT INTO FILM_GENRE (film_id, genre_id) VALUES (?, ?)", film.getId(), genre.getId());
+            }
+        }
+
+        // Получаем обновленные жанры
+        film.setGenres(getGenresForFilm(film.getId()));
 
         log.info("Обновлен объект: " + film);
         return film;
@@ -137,8 +153,8 @@ public Film create(Film film) {
         SqlRowSet resultSet = jdbcTemplate.queryForRowSet(sql, id);
 
         List<Genre> genres = new ArrayList<>();
-        if (!getGenres(id).isEmpty()) {
-            genres = getGenres(id);
+        if (!getGenresForFilm(id).isEmpty()) {
+            genres = getGenresForFilm(id);
         }
 
 
@@ -312,19 +328,20 @@ public Film create(Film film) {
 
 
     public List<Genre> getGenres(Long filmId) {
-        String sqlQuery = "SELECT g.*," +
+        String sqlQuery = "SELECT g.*" +
                 "FROM FILM_GENRE fg " +
                 "JOIN GENRES g ON fg.genre_id = g.id " +
                 "WHERE fg.film_id = ?;";
         //List<Genre> genres = jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenre, filmId);
-        List<Genre> genres = jdbcTemplate.queryForList(sqlQuery, Genre.class,filmId);
+        List<Genre> genres = jdbcTemplate.queryForList(sqlQuery, Genre.class, filmId);
         if (genres.isEmpty()) {
             return Collections.emptyList();
         }
         return genres;
     }
 
-    // Метод для получения информации о GENRE по его идентификатору
+
+    // Метод для получения информации о GENRE по идентификатору фильма
     private List<Genre> getGenresForFilm(Long filmId) {
         String genresSql = "SELECT g.id as genre_id, g.genre_name " +
                 "FROM FILM_GENRE fg " +
@@ -363,6 +380,8 @@ public Film create(Film film) {
 
     // Метод для добавления информации о жанрах в таблицу FILM_GENRE
     private void addGenresForFilm(Long filmId, List<Genre> genres) {
+
+        // Добавляем информацию о новых жанрах в таблицу FILM_GENRE
         if (genres != null && !genres.isEmpty()) {
             for (Genre genre : genres) {
                 jdbcTemplate.update("INSERT INTO FILM_GENRE (film_id, genre_id) VALUES (?, ?)", filmId, genre.getId());
