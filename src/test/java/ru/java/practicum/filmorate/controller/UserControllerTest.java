@@ -3,7 +3,6 @@ package ru.java.practicum.filmorate.controller;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.java.practicum.filmorate.exception.ValidationException;
 import ru.java.practicum.filmorate.model.User;
 import ru.java.practicum.filmorate.service.UserService;
 import ru.java.practicum.filmorate.storage.FriendsStorage;
@@ -18,9 +17,9 @@ import java.time.LocalDate;
 class UserControllerTest {
 
 
-    UserService userService;
-    UserStorage userStorage;
-    FriendsStorage friendsStorage;
+    protected UserService userService;
+    protected UserStorage userStorage;
+    protected FriendsStorage friendsStorage;
     private final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = factory.getValidator();
 

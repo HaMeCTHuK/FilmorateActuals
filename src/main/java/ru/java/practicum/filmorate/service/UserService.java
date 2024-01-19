@@ -42,7 +42,6 @@ public class UserService extends AbstractService<User> {
         if (getData(userId) == null) {
             throw new DataNotFoundException("Такого пользователя с айди нет" + userId);
         }
-
     }
 
     @Override
@@ -53,7 +52,6 @@ public class UserService extends AbstractService<User> {
         if (user == null || friend == null) {
             throw new DataNotFoundException("Друг не добавлен, таких пользователей нет");
         }
-
     }
 
     public List<User> getAllFriends(Long userId) {
@@ -79,5 +77,4 @@ public class UserService extends AbstractService<User> {
         log.info("Получаем список общих друзей пользоватеей ID: " + userId + " и " + friendId);
         return friendsStorage.getCommonFriends(userId, friendId);
     }
-
 }

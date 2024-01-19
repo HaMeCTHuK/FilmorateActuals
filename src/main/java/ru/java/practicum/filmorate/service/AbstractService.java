@@ -14,7 +14,6 @@ public abstract class AbstractService<T extends BaseUnit> {
 
     protected AbstractStorage<T> abstractStorage;
 
-
     public abstract void validate(T data);
 
     public abstract void validateParameter(Long id);

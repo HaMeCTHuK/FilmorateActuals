@@ -19,15 +19,8 @@ import java.util.Set;
 @Transactional
 class FilmControllerTest {
 
-
     private final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = validatorFactory.getValidator();
-
-    @BeforeEach
-    void setUp() {
-
-
-    }
 
     @Test
     void dateFilmValidate() {
@@ -113,5 +106,4 @@ class FilmControllerTest {
 
         Assertions.assertFalse(validator.validate(film).isEmpty());
     }
-
 }
