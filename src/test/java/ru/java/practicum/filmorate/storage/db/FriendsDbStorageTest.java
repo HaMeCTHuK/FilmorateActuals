@@ -129,13 +129,40 @@ class FriendsDbStorageTest {
     @Test
     void getCommonFriends() {
 
+        User newUser = new User(
+                "user@email.ru",
+                "vanya123",
+                "Ivan Petrov",
+                LocalDate.of(1990, 1, 1));
+
+        User newUser2 = new User(
+                "user222222@email.ru",
+                "Petruxa",
+                "Boroda pivnaya",
+                LocalDate.of(2004, 1, 1));
+
+        User newUser3 = new User(
+                "user33333333@email.ru",
+                "tras",
+                "pivo vodka",
+                LocalDate.of(2014, 2, 4));
+
+        UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
         FriendsDbStorage friendsDbStorage = new FriendsDbStorage(jdbcTemplate);
 
-        Long userId = 1L;  // Замените на существующий ID пользователя
-        Long friendId = 2L;  // Замените на существующий ID друга
+        User createdUser = userStorage.create(newUser);
+        User createdUser2 = userStorage.create(newUser2);
+        User createdUser3 = userStorage.create(newUser3);
+
+        Long userId = createdUser.getId();
+        Long friendId = createdUser2.getId();
+        Long commonFriendId = createdUser3.getId();
+
+        friendsDbStorage.addFriend(userId, commonFriendId);
+        friendsDbStorage.addFriend(friendId, commonFriendId);
 
         List<User> commonFriends = friendsDbStorage.getCommonFriends(userId, friendId);
-
+        //Проверяем общего друга
         assertNotNull(commonFriends);
         assertFalse(commonFriends.isEmpty());
     }
@@ -167,14 +194,12 @@ class FriendsDbStorageTest {
         User createdUser2 = userStorage.create(newUser2);
         User createdUser3 = userStorage.create(newUser3);
 
-
         friendsDbStorage.addFriend(createdUser.getId(), createdUser2.getId());
         friendsDbStorage.addFriend(createdUser2.getId(), createdUser.getId());
         friendsDbStorage.addFriend(createdUser3.getId(), createdUser.getId());
 
         String statusConfirmed = friendsDbStorage.getFriendshipStatus(createdUser.getId(), createdUser2.getId());
         String statusUnconfirmed = friendsDbStorage.getFriendshipStatus(createdUser3.getId(), createdUser.getId());
-
 
         assertEquals("confirmed", statusConfirmed);
 
