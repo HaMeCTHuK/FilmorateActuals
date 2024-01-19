@@ -7,6 +7,7 @@ import ru.java.practicum.filmorate.model.Genre;
 import ru.java.practicum.filmorate.storage.GenreStorage;
 
 import java.util.List;
+
 @Service
 @Slf4j
 public class GenreService extends AbstractService<Genre> {
