@@ -19,7 +19,7 @@ public class UserService extends AbstractService<User> {
     private final FriendsStorage friendsStorage;
 
     @Autowired
-    public UserService(@Qualifier("userDbStorage") UserStorage userStorage, FriendsStorage friendsStorage) {
+    public UserService(@Qualifier("userDbStorage")  UserStorage userStorage, FriendsStorage friendsStorage) {
         this.abstractStorage = userStorage;
         this.friendsStorage = friendsStorage;
     }
