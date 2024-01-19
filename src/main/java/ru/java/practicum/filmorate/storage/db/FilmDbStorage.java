@@ -164,6 +164,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getMpa() != null ? film.getMpa().getId() : null,
                 film.getId()};
     }
+
     // Вспомогательный метод для извлечения параметров для SQL-запросов
     private static Map<String, Object> getParams(Film film) {
 
@@ -254,8 +255,8 @@ public class FilmDbStorage implements FilmStorage {
         // Добавляем информацию о новых жанрах в таблицу FILM_GENRE
         if (genres != null && !genres.isEmpty()) {
             for (Genre genre : genres) {
-                jdbcTemplate.update("INSERT INTO FILM_GENRE (film_id, genre_id) VALUES (?, ?)", filmId, genre.getId());
-
+                jdbcTemplate.update("INSERT INTO FILM_GENRE (film_id, genre_id) VALUES (?, ?)",
+                        filmId, genre.getId());
             }
         }
     }

@@ -112,7 +112,13 @@ public class FriendsDbStorage implements FriendsStorage {
                 "FROM friends " +
                 "WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)";
 
-        List<String> friendshipStatusList = jdbcTemplate.queryForList(sqlQuery, String.class, userId, friendId, friendId, userId);
+        List<String> friendshipStatusList = jdbcTemplate.queryForList(
+                sqlQuery,
+                String.class,
+                userId,
+                friendId,
+                friendId,
+                userId);
 
             return friendshipStatusList.get(0);
 
