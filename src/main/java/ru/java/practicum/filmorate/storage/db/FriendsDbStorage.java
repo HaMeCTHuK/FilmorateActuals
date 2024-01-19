@@ -53,7 +53,7 @@ public class FriendsDbStorage implements FriendsStorage {
         int affectedRows = jdbcTemplate.update(sqlQuery, userId, friendId);
 
         jdbcTemplate.update("UPDATE FRIENDS" +
-                " SET friendship = 'unconfirmed' WHERE user_id = ? AND friend_id = ?", friendId , userId);
+                " SET friendship = 'unconfirmed' WHERE user_id = ? AND friend_id = ?", friendId, userId);
 
         return affectedRows > 0;
     }
