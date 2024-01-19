@@ -87,5 +87,4 @@ public class FilmService extends AbstractService<Film> {
         log.info("Получаем самые залайканые фильмы количеством: {}", count);
         return likesStorage.getPopularFilms(count);
     }
-
 }

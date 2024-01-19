@@ -113,7 +113,6 @@ public class FilmDbStorage implements FilmStorage {
             genres = getGenresForFilm(id);
         }
 
-
         if (resultSet.next()) {
             Film film = Film.builder()
                     .id(resultSet.getLong("id"))

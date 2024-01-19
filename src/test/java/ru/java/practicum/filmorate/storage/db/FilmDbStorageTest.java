@@ -23,7 +23,6 @@ class FilmDbStorageTest {
 
     @Test
     void testCreateFilm() {
-        // Подготавливаем данные для теста
         Film newFilm = new Film(
                 "testFilm",
                 "description",
@@ -49,8 +48,6 @@ class FilmDbStorageTest {
     @Test
     void testUpdateFilm() {
         // Подготавливаем данные для теста
-
-
         Film newFilm = new Film(
                 "testFilm2",
                 "description2",
@@ -83,7 +80,6 @@ class FilmDbStorageTest {
         // Проверяем, что фильм успешно обновлен
         assertThat(updatedFilm).isNotNull();
         assertThat(updatedFilm.getName()).isEqualTo(createdFilm.getName());
-
     }
 
     @Test
@@ -110,7 +106,6 @@ class FilmDbStorageTest {
         assertThat(retrievedFilm).isNotNull();
         assertThat(retrievedFilm.getId()).isEqualTo(createdFilm.getId());
         assertThat(retrievedFilm.getName()).isEqualTo(createdFilm.getName());
-
     }
 
     @Test

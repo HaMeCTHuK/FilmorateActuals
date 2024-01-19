@@ -22,8 +22,8 @@ public class MpaDbStorage implements MpaStorage {
     @Override
    // Метод для создания нового MPA рейтинга в базе данных
     public Mpa create(Mpa mpa) {
-        String sql = "INSERT INTO MPARating (rating_name) VALUES (?)";
-        jdbcTemplate.update(sql, mpa.getName());
+        String sql = "INSERT INTO MPARating (id, rating_name) VALUES (?,?)";
+        jdbcTemplate.update(sql,mpa.getId(), mpa.getName());
         return mpa;
     }
 
@@ -61,11 +61,6 @@ public class MpaDbStorage implements MpaStorage {
             throw new DataNotFoundException("При получении MPA по id список не равен 1");
         }
         return mpas.get(0);
-    }
-
-    // Вспомогательный метод для извлечения параметров MPA рейтинга из ResultSet
-    protected Object[] getParameters(Mpa data) {
-        return new Object[]{data.getId(), data.getName()};
     }
 
     // Вспомогательный метод для создания объекта MPA из ResultSet

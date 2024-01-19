@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.model.Genre;
-import ru.java.practicum.filmorate.model.Mpa;
 import ru.java.practicum.filmorate.storage.GenreStorage;
 
 import java.sql.ResultSet;
@@ -18,14 +17,12 @@ public class GenreDbStorage implements GenreStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-
     // Метод для получения списка всех жанров
     @Override
     public List<Genre> getAll() {
         String sqlQuery = "SELECT * FROM GENRES";
         return jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenre);
     }
-
 
     // Метод для получения информации о жанре по его идентификатору
     @Override
@@ -36,11 +33,6 @@ public class GenreDbStorage implements GenreStorage {
             throw new DataNotFoundException("При получении жанра по id список не равен 1");
         }
         return genres.get(0);
-    }
-
-    // Вспомогательный метод для извлечения параметров жанра из ResultSet
-    protected Object[] getParameters(Genre data) {
-        return new Object[]{data.getId(), data.getName()};
     }
 
     // Вспомогательный метод для создания объекта Genre из ResultSet
@@ -54,9 +46,9 @@ public class GenreDbStorage implements GenreStorage {
     @Override
     // Метод для создания нового жанра GENRE в базе данных
     public Genre create(Genre genre) {
-        String sql = "INSERT INTO GENRES (genre_name) VALUES (?)";
-        jdbcTemplate.update(sql, genre.getName());
-        return get(genre.getId());
+        String sql = "INSERT INTO GENRES (id, genre_name) VALUES (?, ?)";
+        jdbcTemplate.update(sql, genre.getId(), genre.getName());
+        return genre;
     }
 
     // Метод для обновления информации о GENRE в базе данных
