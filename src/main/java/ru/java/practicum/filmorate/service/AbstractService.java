@@ -29,11 +29,12 @@ public abstract class AbstractService<T extends BaseUnit> {
     public T update(T data) {
         validate(data);
         log.info("Валидация времени прошла успешно");
-        if (abstractStorage.get(data.getId()) == null) {
+        T updatedData = abstractStorage.update(data);
+        if (updatedData == null) {
             log.info("Данные пользователя не найдены");
             throw new DataNotFoundException("Данные пользователя не найдены");
         }
-        return abstractStorage.update(data);
+        return updatedData;
     }
 
     public List<T> getAll() {
@@ -41,10 +42,11 @@ public abstract class AbstractService<T extends BaseUnit> {
     }
 
     public T getData(Long id) {
-        if (abstractStorage.get(id) == null) {
+        T data = abstractStorage.get(id);
+        if (data == null) {
             log.info("Данные пользователя не найдены");
             throw new DataNotFoundException("Данные пользователя не найдены");
         }
-        return abstractStorage.get(id);
+        return data;
     }
 }

@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS MPARating
 (
-  id            INT PRIMARY KEY,
+  id            INT NOT NULL PRIMARY KEY,
   rating_name   VARCHAR(255)
 );
 
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS GENRES
 
 CREATE TABLE IF NOT EXISTS FILMS
 (
-  id            INT PRIMARY KEY auto_increment,
+  id            INT NOT NULL PRIMARY KEY auto_increment,
   name          VARCHAR(255),
   description   VARCHAR(255),
   release_date  DATE,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS FILM_GENRE
 
 CREATE TABLE IF NOT EXISTS USERS
 (
-  id            INT PRIMARY KEY auto_increment,
+  id            INT NOT NULL PRIMARY KEY auto_increment,
   email         VARCHAR(255) NOT NULL UNIQUE,
   login         VARCHAR(255)NOT NULL UNIQUE,
   name          VARCHAR(255),
