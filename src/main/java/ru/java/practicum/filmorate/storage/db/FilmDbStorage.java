@@ -37,12 +37,9 @@ public class FilmDbStorage implements FilmStorage {
 
         // Добавляем информацию о жанрах в таблицу FILM_GENRE
         addGenresForFilm((long) filmId.intValue(), film.getGenres());
-
         Mpa mpa = getMpaRating(film.getMpa());  // Получаем MPA из базы данных
         film.getMpa().setName(mpa.getName());  // Устанавливаем имя рейтинга MPA в объекте Film
-
         log.info("Добавлен объект: " + film);
-
         return film;
 }
 
@@ -59,17 +56,15 @@ public class FilmDbStorage implements FilmStorage {
                 "MPA_RATING_ID=? " +
                 "WHERE ID=?";
         log.info("Пытаемся обновить информацию о film");
-
-        try {
-            jdbcTemplate.update(sql, getParametersWithId(film));
-        } catch (EmptyResultDataAccessException ex) {
-            throw new DataNotFoundException("Данные о пользователе не найдены");
+        int rowsUpdated = jdbcTemplate.update(sql, getParametersWithId(film));
+        if (rowsUpdated == 0) {
+            log.info("Данные о фильме не найдены");
+            throw new DataNotFoundException("Данные о фильме не найдены");
         }
 
         // Удаляем устаревшие жанры
         String deleteGenresSql = "DELETE FROM FILM_GENRE WHERE film_id = ?";
         jdbcTemplate.update(deleteGenresSql, film.getId());
-
         // Добавляем новые жанры (если они не дублируются)
         Set<Long> existingGenreIds = new HashSet<>();
         for (Genre genre : film.getGenres()) {
@@ -134,10 +129,7 @@ public class FilmDbStorage implements FilmStorage {
                     .build();
 
             film.setGenres(genres);
-
-
             log.info("Найден фильм: {} {}", film.getId(), film.getName());
-
             return film;
         } else {
             log.info("Фильм с идентификатором {} не найден.", id);

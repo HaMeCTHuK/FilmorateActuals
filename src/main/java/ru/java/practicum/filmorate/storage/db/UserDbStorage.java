@@ -41,9 +41,9 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User update(User user) {
         String sql = "UPDATE USERS SET email=?, login=?, name=?, birthday=? WHERE id=?";
-        try {
-            jdbcTemplate.update(sql, getParametersWithId(user));
-        } catch (EmptyResultDataAccessException ex) {
+        int rowsUpdated = jdbcTemplate.update(sql, getParametersWithId(user));
+        if (rowsUpdated == 0) {
+            log.info("Данные о пользователе не найдены");
             throw new DataNotFoundException("Данные о пользователе не найдены");
         }
         log.info("Обновлен объект: " + user);
