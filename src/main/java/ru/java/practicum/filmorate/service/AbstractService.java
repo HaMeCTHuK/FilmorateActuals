@@ -1,17 +1,18 @@
 package ru.java.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.model.BaseUnit;
-import ru.java.practicum.filmorate.storage.memory.InMemoryBaseStorage;
+import ru.java.practicum.filmorate.storage.AbstractStorage;
 
 import java.util.*;
 
 @Slf4j
+@RequiredArgsConstructor
 public abstract class AbstractService<T extends BaseUnit> {
-    @Autowired
-    protected InMemoryBaseStorage<T> inMemoryBaseStorage;
+
+    protected AbstractStorage<T> abstractStorage;
 
     public abstract void validate(T data);
 
@@ -21,28 +22,31 @@ public abstract class AbstractService<T extends BaseUnit> {
 
     public T create(T data) {
         validate(data);
-        log.info("добавляем еще пытаемся");
-        return inMemoryBaseStorage.create(data);
+        log.info("Отправляем данные в класс с работой с БД");
+        return abstractStorage.create(data);
     }
 
     public T update(T data) {
         validate(data);
-        if (inMemoryBaseStorage.get(data.getId()) == null) {
+        log.info("Валидация времени прошла успешно");
+        T updatedData = abstractStorage.update(data);
+        if (updatedData == null) {
             log.info("Данные пользователя не найдены");
             throw new DataNotFoundException("Данные пользователя не найдены");
         }
-        return inMemoryBaseStorage.update(data);
+        return updatedData;
     }
 
     public List<T> getAll() {
-       return inMemoryBaseStorage.getAll();
+       return abstractStorage.getAll();
     }
 
     public T getData(Long id) {
-        if (inMemoryBaseStorage.get(id) == null) {
+        T data = abstractStorage.get(id);
+        if (data == null) {
             log.info("Данные пользователя не найдены");
             throw new DataNotFoundException("Данные пользователя не найдены");
         }
-        return inMemoryBaseStorage.get(id);
+        return data;
     }
 }

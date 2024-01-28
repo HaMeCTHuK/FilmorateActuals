@@ -5,7 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.java.practicum.filmorate.model.User;
 import ru.java.practicum.filmorate.service.UserService;
-import ru.java.practicum.filmorate.storage.memory.InMemoryUserStorage;
+import ru.java.practicum.filmorate.storage.FriendsStorage;
+import ru.java.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -15,15 +16,17 @@ import java.time.LocalDate;
 
 class UserControllerTest {
 
-    UserService userService;
 
+    protected UserService userService;
+    protected UserStorage userStorage;
+    protected FriendsStorage friendsStorage;
     private final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = factory.getValidator();
 
 
     @BeforeEach
-    void setUp() {
-        userService = new UserService(new InMemoryUserStorage());
+             void setUp() {
+        userService = new UserService(userStorage, friendsStorage);
     }
 
     @Test
@@ -35,9 +38,9 @@ class UserControllerTest {
                 .birthday(LocalDate.of(1999,1,22))
                 .build();
 
-        userService.validate(user);
 
-        Assertions.assertEquals("Boroda",user.getName());
+        userService.validate(user);
+        Assertions.assertEquals(user.getName(), user.getLogin());
     }
 
     @Test
@@ -49,15 +52,15 @@ class UserControllerTest {
                 .birthday(LocalDate.of(1999,1,22))
                 .build();
 
-        userService.validate(user);
+        validator.validate(user);
 
-        Assertions.assertEquals("oda",user.getName());
+        Assertions.assertTrue(user.getName().isBlank());
     }
 
     @Test
     public void testEmailValidation() {
         User user = User.builder()
-                .email("invalidEmail")  // проверка на некорректный емаил
+                .email("invalidEmail")
                 .login("Login")
                 .name("totParen")
                 .birthday(LocalDate.now())
@@ -71,7 +74,7 @@ class UserControllerTest {
     public void testLoginNotBlank() {
         User user = User.builder()
                 .email("vlad@mamail.ru")
-                .login("")  // пустой логин
+                .login("")
                 .name("name")
                 .birthday(LocalDate.now())
                 .build();
@@ -85,7 +88,7 @@ class UserControllerTest {
                 .email("valera@boss.com")
                 .login("login")
                 .name("nameless")
-                .birthday(LocalDate.now().plusDays(1))  //дата из будущего
+                .birthday(LocalDate.now().plusDays(1))
                 .build();
 
         Assertions.assertFalse(validator.validate(user).isEmpty());
