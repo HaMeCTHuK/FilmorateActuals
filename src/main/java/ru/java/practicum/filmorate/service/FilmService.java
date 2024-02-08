@@ -10,9 +10,9 @@ import ru.java.practicum.filmorate.exception.ValidationException;
 import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.model.User;
 import ru.java.practicum.filmorate.storage.FilmStorage;
+import ru.java.practicum.filmorate.storage.GenreStorage;
 import ru.java.practicum.filmorate.storage.LikesStorage;
 import ru.java.practicum.filmorate.storage.UserStorage;
-
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,18 +22,22 @@ import java.util.List;
 public class FilmService extends AbstractService<Film> {
 
     private static final LocalDate LAST_RELEASE_DATE = LocalDate.of(1895, 12, 28);
-
     private final UserStorage userStorage;
-
+    private final FilmStorage filmStorage;
     private final LikesStorage likesStorage;
+    private final GenreStorage genreStorage;
 
     @Autowired
     public FilmService(@Qualifier("filmDbStorage")  FilmStorage filmStorage,
-                                                    UserStorage userStorage,
-                                                    LikesStorage likesStorage) {
+                       UserStorage userStorage,
+                       LikesStorage likesStorage,
+                       GenreStorage genreStorage) {
+
         this.abstractStorage = filmStorage;
         this.userStorage = userStorage;
         this.likesStorage = likesStorage;
+        this.filmStorage = filmStorage;
+        this.genreStorage = genreStorage;
     }
 
     @Override
@@ -87,4 +91,49 @@ public class FilmService extends AbstractService<Film> {
         log.info("Получаем самые залайканые фильмы количеством: {}", count);
         return likesStorage.getPopularFilms(count);
     }
+
+    public List<Film> getPopularWithYearForYear(int limit, Long genreId, Integer year) {
+
+        if ((limit <= 0) || (year != null && year <= 0)) {
+            throw new IncorrectParameterException("Некорректные параметры запроса");
+        }
+        if (genreId != null && genreStorage.get(genreId) == null) {
+            throw new DataNotFoundException("Жанра с таким айди нет" + genreId);
+        }
+
+        log.info("Получение списка размером = {}," +
+                " самых популярных фильмов указанного жанра с айди = {} за нужный год = {}.", limit, genreId, year);
+        return filmStorage.getPopularWithYearForYear(limit, genreId, year);
+    }
+
+    public List<Film> getPopularWithGenre(int limit, Long genreId) {
+
+        if (limit <= 0) {
+            throw new IncorrectParameterException("Некорректные параметры запроса");
+        }
+        if (genreId != null && genreStorage.get(genreId) == null) {
+            throw new DataNotFoundException("Жанра с таким айди нет" + genreId);
+        }
+
+        log.info("Получаем список" +
+                " самых популярных фильмов указанного жанра с айди = {}", genreId);
+        return filmStorage.getPopularWithGenre(limit, genreId);
+    }
+
+    public List<Film> getPopularWithYear(int limit, Integer year) {
+
+        if ((limit <= 0) || (year != null && year <= 0)) {
+            throw new IncorrectParameterException("Некорректные параметры запроса");
+        }
+
+        log.info("Получение списка" +
+                " самых популярных фильмов за нужный год = {}.", year);
+        return filmStorage.getPopularWithYear(limit, year);
+    }
+
+    public void deleteFilmById(long filmId) {
+        abstractStorage.delete(filmId);
+        log.info("Удален фильм по ID: " + filmId);
+    }
+
 }

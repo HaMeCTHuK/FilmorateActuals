@@ -6,7 +6,7 @@ import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.model.BaseUnit;
 import ru.java.practicum.filmorate.storage.AbstractStorage;
 
-import java.util.*;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -48,5 +48,12 @@ public abstract class AbstractService<T extends BaseUnit> {
             throw new DataNotFoundException("Данные пользователя не найдены");
         }
         return data;
+    }
+
+    public void delete(Long id) {
+        if (abstractStorage.get(id) == null) {
+            log.info("Данные для удаления не найдены");
+        }
+        abstractStorage.delete(id);
     }
 }

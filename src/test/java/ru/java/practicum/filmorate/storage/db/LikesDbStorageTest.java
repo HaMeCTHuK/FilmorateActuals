@@ -55,7 +55,7 @@ class LikesDbStorageTest {
         likesDbStorage.addLike(filmId, userId);
 
         // Проверяем лайк
-        int likesCount = likesDbStorage.getLikesCountForFilm(filmId);
+        long likesCount = likesDbStorage.getLikesCountForFilm(filmId);
         assertEquals(1, likesCount);
     }
 
@@ -95,7 +95,7 @@ class LikesDbStorageTest {
         likesDbStorage.deleteLike(filmId, userId);
 
         // Проверяем что лайк удален
-        int likesCount = likesDbStorage.getLikesCountForFilm(filmId);
+        long likesCount = likesDbStorage.getLikesCountForFilm(filmId);
         assertEquals(0, likesCount);
     }
 
@@ -143,7 +143,7 @@ class LikesDbStorageTest {
         likesDbStorage.addLike(filmId, userId2);
 
         // Проверяем количество лайков фильма
-        int likesCount = likesDbStorage.getLikesCountForFilm(filmId);
+        long likesCount = likesDbStorage.getLikesCountForFilm(filmId);
         assertEquals(2, likesCount);
     }
 
