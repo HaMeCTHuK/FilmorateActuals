@@ -38,11 +38,11 @@ public class LikesDbStorage implements LikesStorage {
 
     // Метод для получения лайков для конкретного фильма
     @Override
-    public int getLikesCountForFilm(Long filmId) {
+    public long getLikesCountForFilm(Long filmId) {
         String sql = "SELECT COUNT(*) FROM LIKES WHERE film_id = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, filmId);
+        Long count = jdbcTemplate.queryForObject(sql, Long.class, filmId);
         if (count == null) {
-            return 0;
+            return 0L;
         }
         return count;
     }
