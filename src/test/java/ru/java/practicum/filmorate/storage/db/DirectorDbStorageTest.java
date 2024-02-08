@@ -32,7 +32,7 @@ class DirectorDbStorageTest {
     void init() {
         GenreDbStorage genreDbStorage = new GenreDbStorage(jdbcTemplate);
         directorDbStorage = new DirectorDbStorage(jdbcTemplate, genreDbStorage);
-        likeStorage = new LikesDbStorage(jdbcTemplate, genreDbStorage, directorDbStorage);
+        likeStorage = new LikesDbStorage(jdbcTemplate);
         filmStorage = new FilmDbStorage(jdbcTemplate, likeStorage, directorDbStorage, genreDbStorage);
     }
 
