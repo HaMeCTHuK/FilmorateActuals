@@ -354,5 +354,56 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    // Метод для поиска фильма по запросу
+    @Override
+    public List<Film> searchFilmsByQuery(String query, String by) {
+        String sql = "SELECT f.*, m.rating_name AS mpa_rating_name FROM FILMS f " +
+                "LEFT JOIN MPARating m ON f.mpa_rating_id = m.id " +
+                "LEFT JOIN FILM_DIRECTOR fd ON f.ID = fd.FILM_ID " +
+                "LEFT JOIN DIRECTORS d ON fd.DIRECTOR_ID = d.ID ";
+
+        if (by.equals("title")) {
+            List<Film> films = jdbcTemplate.query(sql + "WHERE LOWER(f.NAME) LIKE ?", FilmDbStorage::createFilm, query);
+            // Добавляем жанры и режиссеров к каждому фильму
+            for (Film film : films) {
+                List<Genre> genres = genreDbStorage.getGenresForFilm(film.getId());
+                List<Director> directors = directorDbStorage.getDirectorsForFilm(film.getId());
+                film.setLikes(likesStorage.getLikesCountForFilm(film.getId()));
+                film.setGenres(genres);
+                film.setDirectors(directors);
+            }
+            return films;
+        }
+        if (by.equals("director")) {
+            List<Film> films = jdbcTemplate.query(sql + "WHERE LOWER(d.DIRECTOR_NAME) LIKE ?",
+                    FilmDbStorage::createFilm, query);
+
+            // Добавляем жанры и режиссеров к каждому фильму
+            for (Film film : films) {
+                List<Genre> genres = genreDbStorage.getGenresForFilm(film.getId());
+                List<Director> directors = directorDbStorage.getDirectorsForFilm(film.getId());
+                film.setLikes(likesStorage.getLikesCountForFilm(film.getId()));
+                film.setGenres(genres);
+                film.setDirectors(directors);
+            }
+            return films;
+        }
+        if (by.equals("title,director") || by.equals("director,title")) {
+            List<Film> films = jdbcTemplate.query(sql + "WHERE LOWER(f.NAME) LIKE ? OR LOWER(d.DIRECTOR_NAME) LIKE ?",
+                    FilmDbStorage::createFilm, query, query);
+
+            // Добавляем жанры и режиссеров к каждому фильму
+            for (Film film : films) {
+                List<Genre> genres = genreDbStorage.getGenresForFilm(film.getId());
+                List<Director> directors = directorDbStorage.getDirectorsForFilm(film.getId());
+                film.setLikes(likesStorage.getLikesCountForFilm(film.getId()));
+                film.setGenres(genres);
+                film.setDirectors(directors);
+            }
+            return films;
+        }
+        //Если совподений нет, возвращаем пустой список
+        return new ArrayList<>();
+    }
 }
 

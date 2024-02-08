@@ -15,4 +15,6 @@ public interface FilmStorage extends AbstractStorage<Film> {
 
     List<Film> getPopularWithYear(int limit, Integer year);
 
+    List<Film> searchFilmsByQuery(String query, String by);
+
 }
