@@ -7,7 +7,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.java.practicum.filmorate.exception.ReviewDoesNotExistException;
+import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.model.Review;
 import ru.java.practicum.filmorate.model.User;
@@ -43,8 +43,8 @@ public class ReviewDbStorage implements ReviewStorage {
     //Метод для создания нового отзыва в базе данных.
     public Review create(Review review) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        User user = userStorage.findUserById(review.getUserId());
-        Film film = filmStorage.findFilmById(review.getFilmId());
+        User user = userStorage.get(review.getUserId());
+        Film film = filmStorage.get(review.getFilmId());
         String sqlQuery = "INSERT INTO REVIEW (CONTENT, IS_POSITIVE, USER_ID, FILM_ID, USEFUL) VALUES " +
                 "(?, ?, ?, ?, ?);";
         jdbcTemplate.update(con -> {
@@ -95,7 +95,7 @@ public class ReviewDbStorage implements ReviewStorage {
             return review;
         }
         log.warn("Отзыв с id {} не найден", id);
-        throw new ReviewDoesNotExistException();
+        throw new DataNotFoundException("Отзыв не найден");
     }
 
     // Приватный Метод для отображения строки результата запроса в объект отзыва.
@@ -125,7 +125,7 @@ public class ReviewDbStorage implements ReviewStorage {
     // Метод для добавления лайка к отзыву в базе данных.
     public void addLike(long reviewId, long userId) {
         Review review = findReviewById(reviewId);
-        User user = userStorage.findUserById(userId);
+        User user = userStorage.get(userId);
         String queryToAddLike = "INSERT INTO REVIEW_LIKE (REVIEW_ID, USER_ID) VALUES (?, ?);";
         jdbcTemplate.update(queryToAddLike, reviewId, userId);
         setRightUseful(reviewId);
@@ -135,7 +135,7 @@ public class ReviewDbStorage implements ReviewStorage {
     // Метод для добавления дизлайка к отзыву в базе данных.
     public void addDislike(long reviewId, long userId) {
         Review review = findReviewById(reviewId);
-        User user = userStorage.findUserById(userId);
+        User user = userStorage.get(userId);
         String queryToAddDislike = "INSERT INTO REVIEW_DISLIKE (REVIEW_ID, USER_ID) VALUES (?, ?);";
         jdbcTemplate.update(queryToAddDislike, reviewId, userId);
         setRightUseful(reviewId);
@@ -145,7 +145,7 @@ public class ReviewDbStorage implements ReviewStorage {
     // Метод для удаления лайка отзыва в базе данных.
     public void deleteLike(long reviewId, long userId) {
         Review review = findReviewById(reviewId);
-        User user = userStorage.findUserById(userId);
+        User user = userStorage.get(userId);
         String queryToDeleteLike = "DELETE FROM REVIEW_LIKE WHERE REVIEW_ID = ? AND USER_ID = ?";
         jdbcTemplate.update(queryToDeleteLike, reviewId, userId);
         setRightUseful(reviewId);
@@ -155,7 +155,7 @@ public class ReviewDbStorage implements ReviewStorage {
     // Метод для удаления дизлайка отзыва в базе данных.
     public void deleteDislike(long reviewId, long userId) {
         Review review = findReviewById(reviewId);
-        User user = userStorage.findUserById(userId);
+        User user = userStorage.get(userId);
         String queryToDeleteDislike = "DELETE FROM REVIEW_DISLIKE WHERE REVIEW_ID = ? AND USER_ID = ?";
         jdbcTemplate.update(queryToDeleteDislike, reviewId, userId);
         setRightUseful(reviewId);

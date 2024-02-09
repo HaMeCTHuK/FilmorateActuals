@@ -1,4 +1,4 @@
-package ru.java.practicum.filmorate.controller; // add-reviews - new file 1
+package ru.java.practicum.filmorate.controller; // add-reviews- new file 1
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

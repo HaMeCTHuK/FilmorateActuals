@@ -7,5 +7,4 @@ public interface FilmStorage extends AbstractStorage<Film> {
 
     Mpa getMpaRating(Mpa mpa);
 
-    Film findFilmById(long id); // add-reviews - дополнение в файл
 }
