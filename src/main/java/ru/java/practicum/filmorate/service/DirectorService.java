@@ -94,5 +94,4 @@ public class DirectorService extends AbstractService<Director> {
     public void validateParameters(Long id, Long otherId) {
         throw new UnsupportedOperationException();
     }
-
 }

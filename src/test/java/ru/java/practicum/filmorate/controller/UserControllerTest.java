@@ -17,14 +17,12 @@ import java.time.LocalDate;
 
 class UserControllerTest {
 
-
     protected UserService userService;
     protected UserStorage userStorage;
     protected FriendsStorage friendsStorage;
     protected FilmStorage filmStorage;
     private final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = factory.getValidator();
-
 
     @BeforeEach
              void setUp() {
@@ -107,5 +105,4 @@ class UserControllerTest {
 
         Assertions.assertTrue(validator.validate(user).isEmpty());
     }
-
 }

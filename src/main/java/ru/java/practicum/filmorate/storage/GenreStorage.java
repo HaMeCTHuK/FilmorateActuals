@@ -10,5 +10,4 @@ public interface GenreStorage extends AbstractStorage<Genre> {
     List<Genre> getAll();
 
     Genre get(Long id);
-
 }

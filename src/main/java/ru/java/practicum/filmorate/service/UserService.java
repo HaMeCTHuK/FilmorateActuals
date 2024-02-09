@@ -37,7 +37,6 @@ public class UserService extends AbstractService<User> {
             log.info("имя для отображения пустое — используем использован логин : {}", user.getLogin());
             user.setName(user.getLogin());
         }
-
     }
 
     @Override
@@ -88,5 +87,10 @@ public class UserService extends AbstractService<User> {
         validateParameters(userId, friendId);
         log.info("Получаем список общих друзей пользоватеей ID: " + userId + " и " + friendId);
         return friendsStorage.getCommonFriends(userId, friendId);
+    }
+
+    public void deleteUserById(Long userId) {
+        abstractStorage.delete(userId);
+        log.info("Удален пользователь по ID: " + userId);
     }
 }
