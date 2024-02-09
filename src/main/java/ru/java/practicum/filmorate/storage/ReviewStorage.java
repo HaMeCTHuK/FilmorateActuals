@@ -1,4 +1,4 @@
-package ru.java.practicum.filmorate.storage; // Sprint 12 - file 6
+package ru.java.practicum.filmorate.storage; // Sprint 12 - file 6 controller
 
 import ru.java.practicum.filmorate.model.Review;
 

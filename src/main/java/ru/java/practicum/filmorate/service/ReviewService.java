@@ -1,4 +1,4 @@
-package ru.java.practicum.filmorate.service; // Sprint 12 - file 4
+package ru.java.practicum.filmorate.service; // Sprint 12 - file 4 controller
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

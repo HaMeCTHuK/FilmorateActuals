@@ -1,4 +1,4 @@
-package ru.java.practicum.filmorate.model; // Sprint 12 - file 3
+package ru.java.practicum.filmorate.model; // Sprint 12 - file 3 controller
 
 import lombok.Builder;
 import lombok.Data;

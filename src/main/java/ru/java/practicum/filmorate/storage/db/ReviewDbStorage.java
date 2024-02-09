@@ -1,4 +1,4 @@
-package ru.java.practicum.filmorate.storage.db; // Sprint 12 - file 5 + update - 4 files
+package ru.java.practicum.filmorate.storage.db; // Sprint 12 - contrloller
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
