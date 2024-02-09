@@ -33,5 +33,4 @@ public class GenreController {
         log.info("Получаем рейтинг МРА по айди");
         return genre;
     }
-
 }

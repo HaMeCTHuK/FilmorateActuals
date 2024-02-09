@@ -86,7 +86,6 @@ public class DirectorDbStorage implements DirectorStorage {
         director.setId(id.intValue());
         log.info("Добавлен режиссер: {} {}", director.getId(), director.getName());
         return director;
-
     }
 
     // Метод обновления режиссера в базе данных

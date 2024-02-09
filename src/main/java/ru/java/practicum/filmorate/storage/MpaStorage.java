@@ -9,5 +9,4 @@ public interface MpaStorage extends AbstractStorage<Mpa> {
     List<Mpa> getAll();
 
     Mpa get(Long id);
-
 }

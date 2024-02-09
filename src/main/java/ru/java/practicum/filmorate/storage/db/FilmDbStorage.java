@@ -50,7 +50,6 @@ public class FilmDbStorage implements FilmStorage {
         film.setDirectors(directorDbStorage.getDirectorsForFilm(filmId.longValue()));
         film.setLikes(likesStorage.getLikesCountForFilm(filmId.longValue()));
 
-
         Mpa mpa = getMpaRating(film.getMpa());  // Получаем MPA из базы данных
         film.getMpa().setName(mpa.getName());  // Устанавливаем имя рейтинга MPA в объекте Film
         log.info("Добавлен объект: " + film);

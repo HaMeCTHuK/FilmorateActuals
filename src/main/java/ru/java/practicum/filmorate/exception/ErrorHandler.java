@@ -6,10 +6,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.java.practicum.filmorate.model.ErrorResponse;
 
-
 @RestControllerAdvice
 public class ErrorHandler {
-
 
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -28,7 +26,6 @@ public class ErrorHandler {
     public ErrorResponse handlePostNotFoundException(final DataNotFoundException e) {
         return new ErrorResponse(e.getMessage());
     }
-
 
     @ExceptionHandler(DataAlreadyExistException.class)
     @ResponseStatus(HttpStatus.CONFLICT)

@@ -112,4 +112,11 @@ public class FilmController {
                 " с query " + query + " с by " + by);
         return filmService.searchFilmsByQuery(query, by);
     }
+
+    // DELETE /films/{filmId} — удаляем фильм.
+    @DeleteMapping("/{filmId}")
+    public void deleteUserById(@PathVariable Long filmId) {
+        log.info("Удаляем фильм по ID: " + filmId);
+        filmService.delete(filmId);
+    }
 }

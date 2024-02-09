@@ -82,4 +82,11 @@ public class UserController {
         log.info("Получаем список рекомендованных фильмов для пользователя " + id);
         return userService.getRecommendations(id);
     }
+
+    // DELETE /users/{userId} — удаляем пользователя.
+    @DeleteMapping("/{userId}")
+    public void deleteUserById(@PathVariable Long userId) {
+        log.info("Удаляем пользователя по ID: " + userId);
+        userService.delete(userId);
+    }
 }
