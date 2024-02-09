@@ -251,4 +251,43 @@ public class FilmDbStorage implements FilmStorage {
             }
         }
     }
+
+    @Override
+    // add-reviews - вспомогательный метод для поиска фильма в базе по id
+    public Film findFilmById(long id) {
+        String sql = "SELECT * FROM FILMS " +
+                "LEFT JOIN MPARating ON FILMS.mpa_rating_id = MPARating.id " +
+                "LEFT JOIN FILM_GENRE ON FILMS.id = FILM_GENRE.film_id " +
+                "LEFT JOIN GENRES ON FILM_GENRE.genre_id = GENRES.id " +
+                "WHERE FILMS.id = ?";
+
+        SqlRowSet resultSet = jdbcTemplate.queryForRowSet(sql, id);
+
+        List<Genre> genres = new ArrayList<>();
+        if (!getGenresForFilm(id).isEmpty()) {
+            genres = getGenresForFilm(id);
+        }
+
+        if (resultSet.next()) {
+            Film film = Film.builder()
+                    .id(resultSet.getLong("id"))
+                    .name(resultSet.getString("name"))
+                    .description(resultSet.getString("description"))
+                    .releaseDate(Objects.requireNonNull(resultSet.getDate("release_date")).toLocalDate())
+                    .duration(resultSet.getInt("duration"))
+                    .rating(resultSet.getInt("rating"))
+                    .mpa(Mpa.builder()
+                            .id(resultSet.getLong("mpa_rating_id"))
+                            .name(resultSet.getString("rating_name"))
+                            .build())
+                    .genres(genres)
+                    .build();
+
+            log.info("Найден фильм: {} {}", film.getId(), film.getName());
+            return film;
+        } else {
+            log.info("Фильм с идентификатором {} не найден.", id);
+            throw new DataNotFoundException("Фильм не найден.");
+        }
+    }
 }
