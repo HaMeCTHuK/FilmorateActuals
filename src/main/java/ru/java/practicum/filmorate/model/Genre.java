@@ -7,7 +7,6 @@ import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
 
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder

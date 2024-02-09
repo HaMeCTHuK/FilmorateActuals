@@ -15,5 +15,4 @@ public interface AbstractStorage<T extends BaseUnit> {
     T get(Long id);
 
     void delete(Long id);
-
 }

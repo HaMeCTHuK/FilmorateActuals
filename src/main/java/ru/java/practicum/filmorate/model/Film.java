@@ -1,7 +1,5 @@
 package ru.java.practicum.filmorate.model;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -36,7 +34,9 @@ public class Film extends BaseUnit {
     private Mpa mpa;
     @NotNull
     private List<Genre> genres = new ArrayList<>();
-    @JsonIgnore
+    @NotNull
+    private List<Director> directors = new ArrayList<>();
+    @NotNull
     private Long likes = 0L;
 
     public Film(
@@ -53,6 +53,27 @@ public class Film extends BaseUnit {
         this.duration = duration;
         this.rating = rating;
         this.mpa = mpa;
+        this.likes = likes;
+    }
+
+    public Film(
+            String name,
+            String description,
+            LocalDate releaseDate,
+            int duration,
+            int rating,
+            Mpa mpa,
+            List<Genre> genres,
+            List<Director> directors,
+            Long likes) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.rating = rating;
+        this.mpa = mpa;
+        this.genres = genres;
+        this.directors = directors;
         this.likes = likes;
     }
 }

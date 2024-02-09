@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.exception.IncorrectParameterException;
+import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.model.User;
+import ru.java.practicum.filmorate.storage.FilmStorage;
 import ru.java.practicum.filmorate.storage.FriendsStorage;
 import ru.java.practicum.filmorate.storage.UserStorage;
 
@@ -17,11 +19,15 @@ import java.util.List;
 public class UserService extends AbstractService<User> {
 
     private final FriendsStorage friendsStorage;
+    private final FilmStorage filmStorage;
 
     @Autowired
-    public UserService(@Qualifier("userDbStorage") UserStorage userStorage, FriendsStorage friendsStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage,
+                       FriendsStorage friendsStorage,
+                       FilmStorage filmStorage) {
         this.abstractStorage = userStorage;
         this.friendsStorage = friendsStorage;
+        this.filmStorage = filmStorage;
     }
 
     @Override
@@ -31,7 +37,6 @@ public class UserService extends AbstractService<User> {
             log.info("имя для отображения пустое — используем использован логин : {}", user.getLogin());
             user.setName(user.getLogin());
         }
-
     }
 
     @Override
@@ -60,6 +65,12 @@ public class UserService extends AbstractService<User> {
         return friendsStorage.getAllFriends(userId);
     }
 
+    public List<Film> getRecommendations(Long userId) {
+        validateParameter(userId);
+        log.info("Получаем список рекоммендаций");
+        return filmStorage.getRecommendationsFilms(userId);
+    }
+
     public boolean addFriend(Long userId, Long friendId) {
         validateParameters(userId, friendId);
         log.info("Добавляем пользователю ID: " + userId + ", друга с friendId: " + friendId);
@@ -76,5 +87,10 @@ public class UserService extends AbstractService<User> {
         validateParameters(userId, friendId);
         log.info("Получаем список общих друзей пользоватеей ID: " + userId + " и " + friendId);
         return friendsStorage.getCommonFriends(userId, friendId);
+    }
+
+    public void deleteUserById(Long userId) {
+        abstractStorage.delete(userId);
+        log.info("Удален пользователь по ID: " + userId);
     }
 }

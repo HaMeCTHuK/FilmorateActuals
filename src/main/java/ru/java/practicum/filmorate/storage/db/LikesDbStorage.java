@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
+import ru.java.practicum.filmorate.model.Director;
 import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.model.Genre;
 import ru.java.practicum.filmorate.model.Mpa;
@@ -21,6 +22,8 @@ import java.util.List;
 public class LikesDbStorage implements LikesStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final GenreDbStorage genreDbStorage;
+    private final DirectorDbStorage directorDbStorage;
 
     // Метод для добавления лайка фильма от конкретного пользователя
     @Override
@@ -38,11 +41,11 @@ public class LikesDbStorage implements LikesStorage {
 
     // Метод для получения лайков для конкретного фильма
     @Override
-    public int getLikesCountForFilm(Long filmId) {
+    public long getLikesCountForFilm(Long filmId) {
         String sql = "SELECT COUNT(*) FROM LIKES WHERE film_id = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, filmId);
+        Long count = jdbcTemplate.queryForObject(sql, Long.class, filmId);
         if (count == null) {
-            return 0;
+            return 0L;
         }
         return count;
     }
@@ -75,6 +78,14 @@ public class LikesDbStorage implements LikesStorage {
 
         List<Film> films = jdbcTemplate.query(sql, LikesDbStorage::createFilmWithLikes, count);
 
+        // Добавляем жанры и режиссеров к каждому фильму
+        for (Film film : films) {
+            List<Genre> genres = genreDbStorage.getGenresForFilm(film.getId());
+            List<Director> directors = directorDbStorage.getDirectorsForFilm(film.getId());
+
+            film.setGenres(genres);
+            film.setDirectors(directors);
+        }
         return films;
     }
 
