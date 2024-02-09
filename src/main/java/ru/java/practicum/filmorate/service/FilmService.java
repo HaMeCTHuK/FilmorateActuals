@@ -147,4 +147,9 @@ public class FilmService extends AbstractService<Film> {
         Collections.sort(films, (film1, film2) -> Long.compare(film2.getLikes(), film1.getLikes()));
         return films;
     }
+
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        log.info("Получаем общие фильмы пользователей" + userId + " и " + friendId);
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
 }

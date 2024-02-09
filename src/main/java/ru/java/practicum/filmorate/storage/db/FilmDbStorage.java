@@ -460,5 +460,25 @@ public class FilmDbStorage implements FilmStorage {
         //Если совподений нет, возвращаем пустой список
         return new ArrayList<>();
     }
+
+    // Метод получения общих фильмов пользователей
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        List<Long> usersFilms = likesStorage.getAllFilmLikes(userId);
+        List<Long> friendsFilms = likesStorage.getAllFilmLikes(friendId);
+
+        if (usersFilms.isEmpty() || friendsFilms.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Set<Long> commonFilmsId = new HashSet<>(usersFilms);
+        commonFilmsId.addAll(friendsFilms);
+
+        List<Film> films = new ArrayList<>();
+        for (Long filmId : new HashSet<>(commonFilmsId)) {
+            films.add(get(filmId));
+        }
+        return films.stream().sorted(Comparator.comparingLong(Film::getLikes).reversed())
+                .collect(Collectors.toList());
+    }
 }
 
