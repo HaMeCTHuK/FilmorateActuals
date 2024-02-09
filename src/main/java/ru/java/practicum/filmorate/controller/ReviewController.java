@@ -1,4 +1,4 @@
-package ru.java.practicum.filmorate.controller; // Sprint 12 - file 1 - review
+package ru.java.practicum.filmorate.controller; // Sprint 12 - file 1 - review c
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
