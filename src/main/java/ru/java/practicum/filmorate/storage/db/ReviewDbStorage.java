@@ -1,4 +1,4 @@
-package ru.java.practicum.filmorate.storage.db; // add-reviews- new file 5
+package ru.java.practicum.filmorate.storage.db; // add-reviews - file 5
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;

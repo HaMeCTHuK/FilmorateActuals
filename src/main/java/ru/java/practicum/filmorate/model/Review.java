@@ -1,4 +1,4 @@
-package ru.java.practicum.filmorate.model; // add-reviews- new file 3
+package ru.java.practicum.filmorate.model; // add-reviews- file 3
 
 import lombok.Builder;
 import lombok.Data;
