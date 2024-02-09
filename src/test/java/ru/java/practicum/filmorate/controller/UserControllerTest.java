@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.java.practicum.filmorate.model.User;
 import ru.java.practicum.filmorate.service.UserService;
+import ru.java.practicum.filmorate.storage.FilmStorage;
 import ru.java.practicum.filmorate.storage.FriendsStorage;
 import ru.java.practicum.filmorate.storage.UserStorage;
 
@@ -20,13 +21,14 @@ class UserControllerTest {
     protected UserService userService;
     protected UserStorage userStorage;
     protected FriendsStorage friendsStorage;
+    protected FilmStorage filmStorage;
     private final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = factory.getValidator();
 
 
     @BeforeEach
              void setUp() {
-        userService = new UserService(userStorage, friendsStorage);
+        userService = new UserService(userStorage, friendsStorage, filmStorage);
     }
 
     @Test

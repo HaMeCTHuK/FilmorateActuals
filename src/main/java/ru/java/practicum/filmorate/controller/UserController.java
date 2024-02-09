@@ -3,6 +3,7 @@ package ru.java.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.model.User;
 import ru.java.practicum.filmorate.service.UserService;
 
@@ -73,5 +74,12 @@ public class UserController {
     public List<User> getCommonFriend(@RequestBody @PathVariable Long id, @PathVariable Long otherId) {
         log.info("Получаем список общих друзей пользоватеей ID: " + id + " и " + otherId);
         return userService.getCommonFriends(id, otherId);
+    }
+
+    //GET /users/{id}/recommendations - список рекомендованных фильмов по максимальному пересечению лайков
+    @GetMapping("/{id}/recommendations")
+    public List<Film> getRecommendations(@RequestBody @PathVariable Long id) {
+        log.info("Получаем список рекомендованных фильмов для пользователя " + id);
+        return userService.getRecommendations(id);
     }
 }

@@ -10,6 +10,7 @@ import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.model.Genre;
 import ru.java.practicum.filmorate.model.Mpa;
+import ru.java.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -297,5 +298,139 @@ class FilmDbStorageTest {
         //1 фильма с гождом выпуска 2000 должны быть в списке
         assertEquals(resultFilm.size(),1);
         assertEquals(resultFilm.get(0).getReleaseDate().getYear(), 2000);
+    }
+
+    @Test
+    void testGetRecommendationFilmsWithoutCross() {
+        // Подготавливаем данные для теста
+        Film newFilm1 = new Film(
+                "testFilmr2",
+                "description2",
+                LocalDate.of(1999,2,24),
+                40,
+                1,
+                new Mpa(),
+                10L);
+        newFilm1.getMpa().setId(5);
+
+        Film newFilm2 = new Film(
+                "testFilm2",
+                "description2",
+                LocalDate.of(1999,2,24),
+                40,
+                1,
+                new Mpa(),
+                10L);
+        newFilm2.getMpa().setId(5);
+
+        Film newFilm3 = new Film(
+                "testFilm3",
+                "description3",
+                LocalDate.of(1999,2,24),
+                40,
+                1,
+                new Mpa(),
+                10L);
+        newFilm3.getMpa().setId(5);
+
+        User newUser1 = new User(
+                "test1@email.ru",
+                "test1",
+                "Ivan Petrov",
+                LocalDate.of(1990, 1, 1));
+
+        User newUser2 = new User(
+                "test2@email.ru",
+                "test2",
+                "Ivan Petrov",
+                LocalDate.of(1990, 1, 1));
+
+        // Записываем фильмы в БД
+        filmStorage.create(newFilm1);
+        filmStorage.create(newFilm2);
+        filmStorage.create(newFilm3);
+
+        // Записываем пользователей в БД
+        userStorage.create(newUser1);
+        userStorage.create(newUser2);
+
+        // Ставим лайки НЕ пересекающиеся фильмам
+        likeStorage.addLike(newFilm1.getId(), newUser1.getId());
+        likeStorage.addLike(newFilm2.getId(), newUser2.getId());
+        likeStorage.addLike(newFilm3.getId(), newUser2.getId());
+
+        // Получаем пустой список рекомендаций
+        List<Film> recFilms = filmStorage.getRecommendationsFilms(newUser1.getId());
+
+        // Проверяем, что список пустой
+        assertThat(recFilms).isEmpty();
+    }
+
+    @Test
+    void testGetRecommendationFilmsWithCross() {
+        // Подготавливаем данные для теста
+        Film newFilm1 = new Film(
+                "testFilmr2",
+                "description2",
+                LocalDate.of(1999,2,24),
+                40,
+                1,
+                new Mpa(),
+                10L);
+        newFilm1.getMpa().setId(5);
+
+        Film newFilm2 = new Film(
+                "testFilm2",
+                "description2",
+                LocalDate.of(1999,2,24),
+                40,
+                1,
+                new Mpa(),
+                10L);
+        newFilm2.getMpa().setId(5);
+
+        Film newFilm3 = new Film(
+                "testFilm3",
+                "description3",
+                LocalDate.of(1999,2,24),
+                40,
+                1,
+                new Mpa(),
+                10L);
+        newFilm3.getMpa().setId(5);
+
+        User newUser1 = new User(
+                "test1@email.ru",
+                "test1",
+                "Ivan Petrov",
+                LocalDate.of(1990, 1, 1));
+
+        User newUser2 = new User(
+                "test2@email.ru",
+                "test2",
+                "Ivan Petrov",
+                LocalDate.of(1990, 1, 1));
+
+        // Записываем фильмы в БД
+        filmStorage.create(newFilm1);
+        filmStorage.create(newFilm2);
+        filmStorage.create(newFilm3);
+
+        // Записываем пользователей в БД
+        userStorage.create(newUser1);
+        userStorage.create(newUser2);
+
+        // Ставим лайки
+        // Пересечение по фильму 3
+        likeStorage.addLike(newFilm1.getId(), newUser1.getId());
+        likeStorage.addLike(newFilm3.getId(), newUser1.getId());
+        likeStorage.addLike(newFilm2.getId(), newUser2.getId());
+        likeStorage.addLike(newFilm3.getId(), newUser2.getId());
+
+        // Получаем список рекомендаций
+        List<Film> recFilms = filmStorage.getRecommendationsFilms(newUser1.getId());
+
+        // Проверяем, что рекомендован фильм 2 от пользователя 2
+        assertThat(recFilms.get(0).getName()).isEqualTo(newFilm2.getName());
     }
 }
