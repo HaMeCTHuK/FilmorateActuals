@@ -1,4 +1,4 @@
-package ru.java.practicum.filmorate.storage.db; // add-reviews - file 5
+package ru.java.practicum.filmorate.storage.db; // Sprint 12 - file 5 + update - 4 files
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,7 +40,6 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    //Метод для создания нового отзыва в базе данных.
     public Review create(Review review) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         User user = userStorage.get(review.getUserId());
@@ -63,7 +62,6 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    // Метод для обновления отзыва в базе данных.
     public Review update(Review review) {
         String sqlQuery = "UPDATE REVIEW SET CONTENT = ?, IS_POSITIVE = ? WHERE REVIEW_ID = ?;";
         jdbcTemplate.update(sqlQuery, review.getContent(), review.getIsPositive(), review.getReviewId());
@@ -71,14 +69,12 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    // Метод для удаления отзыва из базы данных.
     public void deleteReview(long id) {
         String sqlQuery = "DELETE FROM REVIEW WHERE REVIEW_ID = ?;";
         jdbcTemplate.update(sqlQuery, id);
     }
 
     @Override
-    // Метод для поиска отзыва в базе данных по его идентификатору.
     public Review findReviewById(long id) {
         String sqlQuery = "SELECT * FROM REVIEW WHERE REVIEW_ID = ?;";
         SqlRowSet reviewRows = jdbcTemplate.queryForRowSet(sqlQuery, id);
@@ -98,7 +94,6 @@ public class ReviewDbStorage implements ReviewStorage {
         throw new DataNotFoundException("Отзыв не найден");
     }
 
-    // Приватный Метод для отображения строки результата запроса в объект отзыва.
     private Review mapRowToReview(ResultSet rs, int rowNum) throws SQLException {
         return Review.builder()
                 .reviewId(rs.getLong("REVIEW_ID"))
@@ -111,7 +106,6 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    // Метод для получения списка отзывов о фильме из базы данных.
     public List<Review> getReviewsOfFilm(long filmId, int count) {
         String queryWithFilmId = "SELECT * FROM REVIEW WHERE FILM_ID = ? ORDER BY USEFUL DESC LIMIT ?";
         String queryWithoutFilmId = "SELECT * FROM REVIEW ORDER BY USEFUL DESC LIMIT ?";
@@ -122,7 +116,6 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    // Метод для добавления лайка к отзыву в базе данных.
     public void addLike(long reviewId, long userId) {
         Review review = findReviewById(reviewId);
         User user = userStorage.get(userId);
@@ -132,7 +125,6 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    // Метод для добавления дизлайка к отзыву в базе данных.
     public void addDislike(long reviewId, long userId) {
         Review review = findReviewById(reviewId);
         User user = userStorage.get(userId);
@@ -142,7 +134,6 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    // Метод для удаления лайка отзыва в базе данных.
     public void deleteLike(long reviewId, long userId) {
         Review review = findReviewById(reviewId);
         User user = userStorage.get(userId);
@@ -152,7 +143,6 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    // Метод для удаления дизлайка отзыва в базе данных.
     public void deleteDislike(long reviewId, long userId) {
         Review review = findReviewById(reviewId);
         User user = userStorage.get(userId);
@@ -161,7 +151,6 @@ public class ReviewDbStorage implements ReviewStorage {
         setRightUseful(reviewId);
     }
 
-    //Приватный метод для коррекции значения поля USEFUL в отзыве в базе данных.
     private void setRightUseful(long reviewId) {
         jdbcTemplate.update(QUERY_TO_SET_USEFUL, reviewId, reviewId, reviewId);
     }
