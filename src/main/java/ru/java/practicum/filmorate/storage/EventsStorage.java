@@ -9,5 +9,6 @@ import java.util.List;
 // интерфейс для работы с сущностью Event в БД
 public interface EventsStorage {
     void addEvent(Long userId, Long entityId, EventType eventType, EventOperation eventOperation);
+
     List<Event> getUserEvents(Long userId);
 }
