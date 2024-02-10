@@ -34,11 +34,9 @@ public class ReviewDbStorage implements ReviewStorage {
 
     public ReviewDbStorage(JdbcTemplate jdbcTemplate, @Qualifier("filmDbStorage") FilmStorage filmStorage,
                            @Qualifier("userDbStorage") UserStorage userStorage) {
-
         this.jdbcTemplate = jdbcTemplate;
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
-
     }
 
     @Override
