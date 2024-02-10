@@ -117,9 +117,6 @@ public class DirectorDbStorage implements DirectorStorage {
     // Метод удаления режиссера из базы данных
     @Override
     public void delete(Long id) {
-        // Удаляем связанные записи из таблицы FILM_DIRECTOR
-        String deleteFilmDirectorQuery = "DELETE FROM FILM_DIRECTOR WHERE director_id = ?";
-        jdbcTemplate.update(deleteFilmDirectorQuery, id);
 
         // Удаляем режиссера из таблицы DIRECTORS
         String deleteDirectorQuery = "DELETE FROM DIRECTORS WHERE id = ?";

@@ -71,21 +71,6 @@ public class UserDbStorage implements UserStorage {
     // Метод для удаления пользователя по его идентификатору
     @Override
     public void delete(Long id) {
-        // Удаляем связанные записи из таблицы FRIENDS
-        String deleteUserQuery = "DELETE FROM FRIENDS WHERE user_id = ?";
-        jdbcTemplate.update(deleteUserQuery, id);
-
-        // Удаляем связанные записи из таблицы FRIENDS
-        String deleteUserLikeQuery = "DELETE FROM LIKES WHERE user_id = ?";
-        jdbcTemplate.update(deleteUserLikeQuery, id);
-
-        // Удаляем связанные записи из таблицы EVENTLOG
-        String deleteUserLogQuery = "DELETE FROM EVENTLOG WHERE user_id = ?";
-        jdbcTemplate.update(deleteUserLogQuery, id);
-
-        // Удаляем связанные записи из таблицы REVIEW
-        String deleteUserReviewQuery = "DELETE FROM REVIEW WHERE user_id = ?";
-        jdbcTemplate.update(deleteUserReviewQuery, id);
 
         String sql = "DELETE FROM USERS WHERE id = ?";
         jdbcTemplate.update(sql, id);

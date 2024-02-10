@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS EVENTLOG
 (
   id            INT NOT NULL PRIMARY KEY auto_increment,
   event_time    TIMESTAMP NOT NULL,
-  user_id       INT NOT NULL REFERENCES USERS(id),
+  user_id       INT NOT NULL REFERENCES USERS(id) ON DELETE CASCADE,
   event_type    INT NOT NULL REFERENCES EVENTTYPES(id),
   operation     INT NOT NULL REFERENCES EVENTOP(id),
   entity_id     INT NOT NULL
