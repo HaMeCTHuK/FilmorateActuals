@@ -88,7 +88,7 @@ public class UserController {
     @DeleteMapping("/{userId}")
     public void deleteUserById(@PathVariable Long userId) {
         log.info("Удаляем пользователя по ID: " + userId);
-        userService.delete(userId);
+        userService.deleteUserById(userId);
     }
 
     // GET /users/{id}/feed - лента событий пользователя
