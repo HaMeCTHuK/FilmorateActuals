@@ -102,5 +102,4 @@ public class UserDbStorage implements UserStorage {
     protected Object[] getParametersWithId(User user) {
         return new Object[]{user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId()};
     }
-
 }
