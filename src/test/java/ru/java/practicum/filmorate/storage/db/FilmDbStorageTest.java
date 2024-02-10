@@ -433,4 +433,52 @@ class FilmDbStorageTest {
         // Проверяем, что рекомендован фильм 2 от пользователя 2
         assertThat(recFilms.get(0).getName()).isEqualTo(newFilm2.getName());
     }
+
+    @Test
+    void testGetCommonFilms() {
+        LikesDbStorage likeStorage = new LikesDbStorage(jdbcTemplate, genreStorage, directorDbStorage);
+        DirectorDbStorage directorDbStorage = new DirectorDbStorage(jdbcTemplate, genreStorage);
+        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate, likeStorage, directorDbStorage, genreStorage);
+        UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
+
+        // Подготавливаем данные для теста
+        Film newFilm1 = new Film(
+                "testFilm2",
+                "description2",
+                LocalDate.of(1999,2,24),
+                40,
+                1,
+                new Mpa(),
+                10L);
+        newFilm1.getMpa().setId(5);
+
+        User newUser1 = new User(
+                "test1@email.ru",
+                "test1",
+                "Ivan Petrov",
+                LocalDate.of(1990, 1, 1));
+
+        User newUser2 = new User(
+                "test2@email.ru",
+                "test2",
+                "Ivan Petrov",
+                LocalDate.of(1990, 1, 1));
+
+        // Записываем фильмы в БД
+        filmStorage.create(newFilm1);
+
+        // Записываем пользователей в БД
+        userStorage.create(newUser1);
+        userStorage.create(newUser2);
+
+        // Ставим лайки
+        likeStorage.addLike(newFilm1.getId(), newUser1.getId());
+        likeStorage.addLike(newFilm1.getId(), newUser2.getId());
+
+        // Получаем список общих фильмов
+        List<Film> commonFilms = filmStorage.getCommonFilms(newUser1.getId(), newUser2.getId());
+
+        // Проверяем, что общим является фильм 1
+        assertThat(commonFilms.get(0).getName()).isEqualTo("testFilm2");
+    }
 }
