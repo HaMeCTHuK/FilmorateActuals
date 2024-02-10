@@ -4,10 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.java.practicum.filmorate.event.Events;
+import ru.java.practicum.filmorate.event.FriendEvents;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.exception.IncorrectParameterException;
+import ru.java.practicum.filmorate.model.Event;
 import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.model.User;
+import ru.java.practicum.filmorate.storage.EventsStorage;
 import ru.java.practicum.filmorate.storage.FilmStorage;
 import ru.java.practicum.filmorate.storage.FriendsStorage;
 import ru.java.practicum.filmorate.storage.UserStorage;
@@ -20,14 +24,17 @@ public class UserService extends AbstractService<User> {
 
     private final FriendsStorage friendsStorage;
     private final FilmStorage filmStorage;
+    private final Events events;
 
     @Autowired
     public UserService(@Qualifier("userDbStorage") UserStorage userStorage,
                        FriendsStorage friendsStorage,
-                       FilmStorage filmStorage) {
+                       FilmStorage filmStorage,
+                       EventsStorage eventsStorage) {
         this.abstractStorage = userStorage;
         this.friendsStorage = friendsStorage;
         this.filmStorage = filmStorage;
+        this.events = new FriendEvents(eventsStorage);
     }
 
     @Override
@@ -74,12 +81,14 @@ public class UserService extends AbstractService<User> {
     public boolean addFriend(Long userId, Long friendId) {
         validateParameters(userId, friendId);
         log.info("Добавляем пользователю ID: " + userId + ", друга с friendId: " + friendId);
+        events.add(userId, friendId);
         return friendsStorage.addFriend(userId, friendId);
     }
 
     public boolean deleteFriend(Long userId, Long friendId) {
         validateParameters(userId, friendId);
         log.info("Удаляем у пользователя ID: " + userId + " друга с friendId: " + friendId);
+        events.remove(userId, friendId);
         return friendsStorage.deleteFriend(userId, friendId);
     }
 
@@ -92,5 +101,11 @@ public class UserService extends AbstractService<User> {
     public void deleteUserById(Long userId) {
         abstractStorage.delete(userId);
         log.info("Удален пользователь по ID: " + userId);
+    }
+
+    public List<Event> getFeed(Long userId) {
+        validateParameter(userId);
+        log.info("Получаем ленту событий");
+        return events.getFeed(userId);
     }
 }

@@ -4,15 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.java.practicum.filmorate.event.Events;
+import ru.java.practicum.filmorate.event.LikeEvents;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.exception.IncorrectParameterException;
 import ru.java.practicum.filmorate.exception.ValidationException;
 import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.model.User;
-import ru.java.practicum.filmorate.storage.FilmStorage;
-import ru.java.practicum.filmorate.storage.GenreStorage;
-import ru.java.practicum.filmorate.storage.LikesStorage;
-import ru.java.practicum.filmorate.storage.UserStorage;
+import ru.java.practicum.filmorate.storage.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,18 +27,21 @@ public class FilmService extends AbstractService<Film> {
     private final FilmStorage filmStorage;
     private final LikesStorage likesStorage;
     private final GenreStorage genreStorage;
+    private final Events events;
 
     @Autowired
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
                        UserStorage userStorage,
                        LikesStorage likesStorage,
-                       GenreStorage genreStorage) {
+                       GenreStorage genreStorage,
+                       EventsStorage eventsStorage) {
 
         this.abstractStorage = filmStorage;
         this.userStorage = userStorage;
         this.likesStorage = likesStorage;
         this.filmStorage = filmStorage;
         this.genreStorage = genreStorage;
+        this.events = new LikeEvents(eventsStorage);
     }
 
     @Override
@@ -75,12 +77,14 @@ public class FilmService extends AbstractService<Film> {
         validateParameters(filmId, userId);
         log.info("Добавляем лайк от пользователя с айди : {} для фильма {}", userId, filmId);
         likesStorage.addLike(filmId, userId);
+        events.add(userId, filmId);
     }
 
     public void deleteLike(long filmId, long userId) {
         validateParameters(filmId, userId);
         log.info("Удаляем лайк от пользователя с айди : {}", userId);
         likesStorage.deleteLike(filmId, userId);
+        events.remove(userId, filmId);
     }
 
     public List<Long> getAllFilmLikes(Long filmId) {
