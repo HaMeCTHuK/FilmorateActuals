@@ -6,7 +6,10 @@ import java.util.List;
 
 public interface Events {
     void add(Long userId, Long entityId);
+
     void remove(Long userId, Long entityId);
+
     void update(Long userId, Long entityId);
+
     List<Event> getFeed(Long userId);
 }
