@@ -22,7 +22,7 @@ public enum EventOperation {
     }
 
     public static EventOperation fromString(String str) {
-        switch(str) {
+        switch (str) {
             case "ADD":
                 return EventOperation.ADD;
             case "REMOVE":

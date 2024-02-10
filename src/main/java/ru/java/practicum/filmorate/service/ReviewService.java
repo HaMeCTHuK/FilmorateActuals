@@ -17,7 +17,7 @@ import java.util.List;
 public class ReviewService {
 
     private final ReviewStorage reviewStorage;
-    private Events events;
+    private final Events events;
 
     @Autowired
     public ReviewService(ReviewStorage reviewStorage, EventsStorage eventsStorage) {
