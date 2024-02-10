@@ -53,6 +53,7 @@ public abstract class AbstractService<T extends BaseUnit> {
     public void delete(Long id) {
         if (abstractStorage.get(id) == null) {
             log.info("Данные для удаления не найдены");
+            throw new DataNotFoundException("Данные пользователя не найдены");
         }
         abstractStorage.delete(id);
     }
