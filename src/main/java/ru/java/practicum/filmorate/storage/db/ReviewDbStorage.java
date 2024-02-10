@@ -174,7 +174,6 @@ public class ReviewDbStorage implements ReviewStorage {
 
     //Приватный метод для коррекции значения поля USEFUL в отзыве в базе данных.
     private void setRightUseful(long reviewId) {
-        
         jdbcTemplate.update(QUERY_TO_SET_USEFUL, reviewId, reviewId, reviewId);
     }
 }
