@@ -50,4 +50,10 @@ public abstract class AbstractService<T extends BaseUnit> {
         return data;
     }
 
+    public void delete(Long id) {
+        if (abstractStorage.get(id) == null) {
+            log.info("Данные для удаления не найдены");
+        }
+        abstractStorage.delete(id);
+    }
 }
