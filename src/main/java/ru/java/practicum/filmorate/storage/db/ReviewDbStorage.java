@@ -34,14 +34,17 @@ public class ReviewDbStorage implements ReviewStorage {
 
     public ReviewDbStorage(JdbcTemplate jdbcTemplate, @Qualifier("filmDbStorage") FilmStorage filmStorage,
                            @Qualifier("userDbStorage") UserStorage userStorage) {
+
         this.jdbcTemplate = jdbcTemplate;
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+
     }
 
     @Override
     //Метод для создания нового отзыва в базе данных.
     public Review create(Review review) {
+
         KeyHolder keyHolder = new GeneratedKeyHolder();
         User user = userStorage.get(review.getUserId());
         Film film = filmStorage.get(review.getFilmId());
@@ -65,6 +68,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     // Метод для обновления отзыва в базе данных.
     public Review update(Review review) {
+
         String sqlQuery = "UPDATE REVIEW SET CONTENT = ?, IS_POSITIVE = ? WHERE REVIEW_ID = ?;";
         jdbcTemplate.update(sqlQuery, review.getContent(), review.getIsPositive(), review.getReviewId());
         return findReviewById(review.getReviewId());
@@ -73,6 +77,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     // Метод для удаления отзыва из базы данных.
     public void deleteReview(long id) {
+
         String sqlQuery = "DELETE FROM REVIEW WHERE REVIEW_ID = ?;";
         jdbcTemplate.update(sqlQuery, id);
     }
@@ -80,6 +85,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     // Метод для поиска отзыва в базе данных по его идентификатору.
     public Review findReviewById(long id) {
+
         String sqlQuery = "SELECT * FROM REVIEW WHERE REVIEW_ID = ?;";
         SqlRowSet reviewRows = jdbcTemplate.queryForRowSet(sqlQuery, id);
         if (reviewRows.next()) {
@@ -100,6 +106,7 @@ public class ReviewDbStorage implements ReviewStorage {
 
     // Приватный Метод для отображения строки результата запроса в объект отзыва.
     private Review mapRowToReview(ResultSet rs, int rowNum) throws SQLException {
+
         return Review.builder()
                 .reviewId(rs.getLong("REVIEW_ID"))
                 .content(rs.getString("CONTENT"))
@@ -113,6 +120,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     // Метод для получения списка отзывов о фильме из базы данных.
     public List<Review> getReviewsOfFilm(long filmId, int count) {
+
         String queryWithFilmId = "SELECT * FROM REVIEW WHERE FILM_ID = ? ORDER BY USEFUL DESC LIMIT ?";
         String queryWithoutFilmId = "SELECT * FROM REVIEW ORDER BY USEFUL DESC LIMIT ?";
         if (filmId == 0) {
@@ -124,6 +132,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     // Метод для добавления лайка к отзыву в базе данных.
     public void addLike(long reviewId, long userId) {
+
         Review review = findReviewById(reviewId);
         User user = userStorage.get(userId);
         String queryToAddLike = "INSERT INTO REVIEW_LIKE (REVIEW_ID, USER_ID) VALUES (?, ?);";
@@ -144,6 +153,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     // Метод для удаления лайка отзыва в базе данных.
     public void deleteLike(long reviewId, long userId) {
+
         Review review = findReviewById(reviewId);
         User user = userStorage.get(userId);
         String queryToDeleteLike = "DELETE FROM REVIEW_LIKE WHERE REVIEW_ID = ? AND USER_ID = ?";
@@ -154,6 +164,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     // Метод для удаления дизлайка отзыва в базе данных.
     public void deleteDislike(long reviewId, long userId) {
+
         Review review = findReviewById(reviewId);
         User user = userStorage.get(userId);
         String queryToDeleteDislike = "DELETE FROM REVIEW_DISLIKE WHERE REVIEW_ID = ? AND USER_ID = ?";
@@ -163,6 +174,7 @@ public class ReviewDbStorage implements ReviewStorage {
 
     //Приватный метод для коррекции значения поля USEFUL в отзыве в базе данных.
     private void setRightUseful(long reviewId) {
+        
         jdbcTemplate.update(QUERY_TO_SET_USEFUL, reviewId, reviewId, reviewId);
     }
 }
