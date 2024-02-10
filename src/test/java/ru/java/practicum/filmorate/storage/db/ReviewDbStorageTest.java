@@ -42,6 +42,7 @@ public class ReviewDbStorageTest {
         userStorage = new UserDbStorage(jdbcTemplate);
         reviewDbStorage = new ReviewDbStorage(jdbcTemplate,filmStorage, userStorage);
     }
+
     private static Validator validator;
 
     static {
@@ -88,6 +89,7 @@ public class ReviewDbStorageTest {
 
     @Test
     public void shouldNotPassContentValidation() {
+
         User user = User.builder()
                 .login("Ivory")
                 .name("Melissa")
@@ -123,6 +125,7 @@ public class ReviewDbStorageTest {
 
     @Test
     public void shouldNotPassIsPositiveValidation() {
+
         User user = User.builder()
                 .login("Rina")
                 .name("Melissa")
@@ -158,6 +161,7 @@ public class ReviewDbStorageTest {
 
     @Test
     public void shouldNotPassUserIdValidation() {
+
         User user = User.builder()
                 .login("Lime")
                 .name("Melissa")
@@ -193,6 +197,7 @@ public class ReviewDbStorageTest {
 
     @Test
     public void shouldNotPassFilmIdValidation() {
+
         User user = User.builder()
                 .login("Lemon")
                 .name("Melissa")
@@ -228,6 +233,7 @@ public class ReviewDbStorageTest {
 
     @Test
     public void shouldUpdateReview() {
+
         User user = User.builder()
                 .login("Melon")
                 .name("Melissa")
@@ -273,6 +279,7 @@ public class ReviewDbStorageTest {
 
     @Test
     public void shouldDeleteReview() {
+
         Film film = Film.builder()
                 .name("Форрест Гамп")
                 .description("Жизнь как коробка конфет")
@@ -310,6 +317,7 @@ public class ReviewDbStorageTest {
 
     @Test
     public void shouldFindReviewById() {
+
         Film film = Film.builder()
                 .name("Форрест Гамп")
                 .description("Жизнь как коробка конфет")
@@ -346,6 +354,7 @@ public class ReviewDbStorageTest {
 
     @Test
     public void shouldGetReviewsOfFilm() {
+
         Film film = Film.builder()
                 .name("Форрест Гамп")
                 .description("Жизнь как коробка конфет")
@@ -391,6 +400,7 @@ public class ReviewDbStorageTest {
 
     @Test
     public void shouldAddLike() {
+
         Film film = Film.builder()
                 .name("Форрест Гамп")
                 .description("Жизнь как коробка конфет")
@@ -428,6 +438,7 @@ public class ReviewDbStorageTest {
 
     @Test
     public void shouldAddDislike() {
+
         Film film = Film.builder()
                 .name("Форрест Гамп")
                 .description("Жизнь как коробка конфет")
@@ -465,6 +476,7 @@ public class ReviewDbStorageTest {
 
     @Test
     public void shouldDeleteLike() {
+
         Film film = Film.builder()
                 .name("Форрест Гамп")
                 .description("Жизнь как коробка конфет")
@@ -503,6 +515,7 @@ public class ReviewDbStorageTest {
 
     @Test
     public void shouldDeleteDislike() {
+
         Film film = Film.builder()
                 .name("Форрест Гамп")
                 .description("Жизнь как коробка конфет")
@@ -538,5 +551,4 @@ public class ReviewDbStorageTest {
 
         assertEquals(0, reviewDbStorage.findReviewById(review.getReviewId()).getUseful());
     }
-
 }
