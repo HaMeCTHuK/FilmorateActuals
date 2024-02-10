@@ -471,7 +471,8 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         Set<Long> commonFilmsId = new HashSet<>(usersFilms);
-        commonFilmsId.addAll(friendsFilms);
+        commonFilmsId.retainAll(new HashSet<>(friendsFilms));
+
 
         List<Film> films = new ArrayList<>();
         for (Long filmId : new HashSet<>(commonFilmsId)) {
