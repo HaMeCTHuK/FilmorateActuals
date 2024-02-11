@@ -457,42 +457,6 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     // Метод для поиска фильма по запросу
-/*    @Override
-    public List<Film> searchFilmsByQuery(String query, String by) {
-        String sql = "SELECT f.*, " +
-                "m.rating_name AS mpa_rating_name, " +
-                "GROUP_CONCAT(DISTINCT CONCAT(g.id, ':', g.genre_name)) AS genres, " +
-                "GROUP_CONCAT(DISTINCT CONCAT(d.id, ':', d.director_name)) AS directors, " +
-                "COUNT(l.film_id) AS like_count " +
-                "FROM FILMS f " +
-                "LEFT JOIN MPARating m ON f.mpa_rating_id = m.id " +
-                "LEFT JOIN FILM_GENRE fg ON f.id = fg.film_id " +
-                "LEFT JOIN GENRES g ON fg.genre_id = g.id " +
-                "LEFT JOIN LIKES l ON f.id = l.film_id " +
-                "LEFT JOIN FILM_DIRECTOR fd ON f.id = fd.film_id " +
-                "LEFT JOIN DIRECTORS d ON fd.DIRECTOR_ID = d.ID " +
-                "GROUP BY f.id ";
-
-        if (by.equals("title")) {
-            List<Film> films = jdbcTemplate.query(sql + " WHERE LOWER(f.NAME) LIKE ?", FilmDbStorage::createFilm, query);
-
-            return films;
-        }
-        if (by.equals("director")) {
-            List<Film> films = jdbcTemplate.query(sql + " WHERE LOWER(d.DIRECTOR_NAME) LIKE ?",
-                    FilmDbStorage::createFilm, query);
-
-            return films;
-        }
-        if (by.equals("title,director") || by.equals("director,title")) {
-            List<Film> films = jdbcTemplate.query(sql + " WHERE LOWER(f.NAME) LIKE ? OR LOWER(d.DIRECTOR_NAME) LIKE ?",
-                    FilmDbStorage::createFilm, query, query);
-
-            return films;
-        }
-        //Если совподений нет, возвращаем пустой список
-        return new ArrayList<>();
-    }*/
     @Override
     public List<Film> searchFilmsByQuery(String query, String by) {
         String sql = "SELECT f.*, " +
@@ -509,16 +473,20 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN DIRECTORS d ON fd.DIRECTOR_ID = d.ID " +
                 "GROUP BY f.id ";
 
-        String whereClause = "";
+        List<Film> films = new ArrayList<>();
+
+        String havingClause = "";
         if (by.equals("title")) {
-            whereClause = " WHERE LOWER(f.NAME) LIKE ?";
+            havingClause = " HAVING LOWER(f.NAME) LIKE ?";
+            films = jdbcTemplate.query(sql + havingClause, FilmDbStorage::createFilm, query);
         } else if (by.equals("director")) {
-            whereClause = " WHERE LOWER(d.DIRECTOR_NAME) LIKE ?";
+            havingClause = " HAVING LOWER(d.DIRECTOR_NAME) LIKE ?";
+            films = jdbcTemplate.query(sql + havingClause, FilmDbStorage::createFilm, query);
         } else if (by.equals("title,director") || by.equals("director,title")) {
-            whereClause = " HAVING LOWER(f.NAME) LIKE ? OR LOWER(d.DIRECTOR_NAME) LIKE ?";
+            havingClause = " HAVING LOWER(f.NAME) LIKE ? OR LOWER(d.DIRECTOR_NAME) LIKE ?";
+            films = jdbcTemplate.query(sql + havingClause, FilmDbStorage::createFilm, query, query);
         }
 
-        List<Film> films = jdbcTemplate.query(sql + whereClause, FilmDbStorage::createFilm, query);
         return films;
     }
 
