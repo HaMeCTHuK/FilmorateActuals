@@ -7,20 +7,6 @@ public enum EventOperation {
     UPDATE
     ;
 
-    @Override
-    public String toString() {
-        switch (this.ordinal()) {
-            case 0:
-                return "ADD";
-            case 1:
-                return "REMOVE";
-            case 2:
-                return "UPDATE";
-            default:
-                return null;
-        }
-    }
-
     public static EventOperation fromString(String str) {
         switch (str) {
             case "ADD":
