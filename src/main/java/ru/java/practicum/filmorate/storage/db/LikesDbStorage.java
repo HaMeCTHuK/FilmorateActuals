@@ -83,7 +83,7 @@ public class LikesDbStorage implements LikesStorage {
 
         return jdbcTemplate.query(sql, rs -> {
             String genresString = rs.next() ? rs.getString("genres") : "";
-            if (genresString.isEmpty() || genresString.equals(":") ) {
+            if (genresString.isEmpty() || genresString.equals(":")) {
                 return Collections.emptyList();
             }
             return Arrays.stream(genresString.split(","))
