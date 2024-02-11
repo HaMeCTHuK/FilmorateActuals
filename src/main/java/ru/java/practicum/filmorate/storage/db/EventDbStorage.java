@@ -65,8 +65,8 @@ public class EventDbStorage implements EventsStorage {
                 .userId(rs.getLong("user_id"))
                 .entityId(rs.getLong("entity_id"))
                 .timestamp(rs.getTimestamp("event_time").getTime())
-                .operation(EventOperation.fromString(rs.getString("operation")))
-                .eventType(EventType.fromString(rs.getString("event_type")))
+                .operation(EventOperation.valueOf(rs.getString("operation")))
+                .eventType(EventType.valueOf(rs.getString("event_type")))
                 .build();
     }
 
@@ -76,7 +76,7 @@ public class EventDbStorage implements EventsStorage {
                 "FROM EVENTTYPES " +
                 "WHERE name = ?";
 
-        SqlRowSet resultSet = jdbcTemplate.queryForRowSet(sql, eventType.toString());
+        SqlRowSet resultSet = jdbcTemplate.queryForRowSet(sql, eventType.name());
         resultSet.next();
 
         return resultSet.getLong("id");
@@ -88,7 +88,7 @@ public class EventDbStorage implements EventsStorage {
                 "FROM EVENTOP " +
                 "WHERE name = ?";
 
-        SqlRowSet resultSet = jdbcTemplate.queryForRowSet(sql, eventOperation.toString());
+        SqlRowSet resultSet = jdbcTemplate.queryForRowSet(sql, eventOperation.name());
         resultSet.next();
 
         return resultSet.getLong("id");
