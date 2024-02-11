@@ -35,8 +35,8 @@ public class EventsDbStorageTest {
     @BeforeEach
     void init() {
         genreStorage = new GenreDbStorage(jdbcTemplate);
-        directorDbStorage = new DirectorDbStorage(jdbcTemplate, genreStorage);
-        likeStorage = new LikesDbStorage(jdbcTemplate, genreStorage, directorDbStorage);
+        directorDbStorage = new DirectorDbStorage(jdbcTemplate);
+        likeStorage = new LikesDbStorage(jdbcTemplate);
         filmStorage = new FilmDbStorage(jdbcTemplate, likeStorage, directorDbStorage, genreStorage);
         userStorage = new UserDbStorage(jdbcTemplate);
         eventStorage = new EventDbStorage(jdbcTemplate);

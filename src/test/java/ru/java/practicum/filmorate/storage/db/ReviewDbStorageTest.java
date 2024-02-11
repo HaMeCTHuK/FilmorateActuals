@@ -36,8 +36,8 @@ public class ReviewDbStorageTest {
     @BeforeEach
     void init() {
         GenreDbStorage genreStorage = new GenreDbStorage(jdbcTemplate);
-        DirectorDbStorage directorDbStorage = new DirectorDbStorage(jdbcTemplate, genreStorage);
-        LikesDbStorage likeStorage = new LikesDbStorage(jdbcTemplate, genreStorage, directorDbStorage);
+        DirectorDbStorage directorDbStorage = new DirectorDbStorage(jdbcTemplate);
+        LikesDbStorage likeStorage = new LikesDbStorage(jdbcTemplate);
         filmStorage = new FilmDbStorage(jdbcTemplate, likeStorage, directorDbStorage, genreStorage);
         userStorage = new UserDbStorage(jdbcTemplate);
         reviewDbStorage = new ReviewDbStorage(jdbcTemplate,filmStorage, userStorage);

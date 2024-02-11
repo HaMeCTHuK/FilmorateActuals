@@ -12,8 +12,9 @@ import ru.java.practicum.filmorate.storage.LikesStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Component
 @RequiredArgsConstructor
@@ -21,8 +22,6 @@ import java.util.stream.Collectors;
 public class LikesDbStorage implements LikesStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private final GenreDbStorage genreDbStorage;
-    private final DirectorDbStorage directorDbStorage;
 
     // Метод для добавления лайка фильма от конкретного пользователя
     @Override
@@ -77,56 +76,6 @@ public class LikesDbStorage implements LikesStorage {
         List<Film> films = jdbcTemplate.query(sql, LikesDbStorage::createFilmWithLikes, count);
 
         return films;
-    }
-
-    public List<Genre> getGenresForFilm(String sql) {
-
-        return jdbcTemplate.query(sql, rs -> {
-            String genresString = rs.next() ? rs.getString("genres") : "";
-            if (genresString.isEmpty() || genresString.equals(":")) {
-                return Collections.emptyList();
-            }
-            return Arrays.stream(genresString.split(","))
-                    .map(genre -> {
-                        String[] parts = genre.split(":");
-                        return new Genre().builder().id(Long.parseLong(parts[0])).name(parts[1]).build();
-                    })
-                    .collect(Collectors.toList());
-        });
-    }
-
-    public List<Director> getDirectorsForFilm(String sql) {
-        Map<Long, List<Genre>> filmGenresMap = new HashMap<>();
-
-        return jdbcTemplate.query(sql, rs -> {
-            String directorsString = rs.next() ? rs.getString("directors") : "";
-            if (directorsString.isEmpty() || directorsString.equals(":")) {
-                return Collections.emptyList();
-            }
-            return Arrays.stream(directorsString.split(","))
-                    .map(director -> {
-                        String[] parts = director.split(":");
-                        //return new Director(Long.parseLong(parts[0]), parts[1]);
-                        return new Director().builder().id(Long.parseLong(parts[0])).name(parts[1]).build();
-                    })
-                    .collect(Collectors.toList());
-        });
-    }
-
-    // Вспомогательный метод для создания объекта Genre из ResultSet
-    public static Genre createGenre(ResultSet rs, int rowNum) throws SQLException {
-        return Genre.builder()
-                .id(rs.getLong("genre_id"))
-                .name(rs.getString("genre_name"))
-                .build();
-    }
-
-    // Вспомогательный метод для создания объекта Director из ResultSet
-    static Director createDirector(ResultSet rs, int rowNum) throws SQLException {
-        return Director.builder()
-                .id(rs.getLong("id"))
-                .name(rs.getString("director_name"))
-                .build();
     }
 
     // Вспомогательный метод для создания объекта Mpa из ResultSet

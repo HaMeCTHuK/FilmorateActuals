@@ -160,16 +160,6 @@ public class FilmDbStorage implements FilmStorage {
                             .id(resultSet.getLong("mpa_rating_id"))
                             .name(resultSet.getString("rating_name"))
                             .build())
-                    .genres(Collections.singletonList(
-                            Genre.builder()
-                                    .id(resultSet.getLong("id"))
-                                    .name(resultSet.getString("genre_name"))
-                                    .build()))
-                    .directors(Collections.singletonList(
-                            Director.builder()
-                                    .id(resultSet.getLong("id"))
-                                    .name(resultSet.getString("director_name"))
-                                    .build()))
                     .build();
 
             List<Genre> genres = genreDbStorage.getGenresForFilm(id);

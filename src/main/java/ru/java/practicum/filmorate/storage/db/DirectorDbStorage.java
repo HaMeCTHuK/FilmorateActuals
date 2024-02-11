@@ -22,7 +22,6 @@ import java.util.Map;
 public class DirectorDbStorage implements DirectorStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private final GenreDbStorage genreDbStorage;
 
     // Метод получения списка фильмов режисера с сортировкой по году
     @Override

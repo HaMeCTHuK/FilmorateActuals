@@ -33,8 +33,8 @@ class FilmDbStorageTest {
     @BeforeEach
     void init() {
         genreStorage = new GenreDbStorage(jdbcTemplate);
-        directorDbStorage = new DirectorDbStorage(jdbcTemplate, genreStorage);
-        likeStorage = new LikesDbStorage(jdbcTemplate, genreStorage, directorDbStorage);
+        directorDbStorage = new DirectorDbStorage(jdbcTemplate);
+        likeStorage = new LikesDbStorage(jdbcTemplate);
         filmStorage = new FilmDbStorage(jdbcTemplate, likeStorage, directorDbStorage, genreStorage);
         userStorage = new UserDbStorage(jdbcTemplate);
     }
@@ -436,10 +436,6 @@ class FilmDbStorageTest {
 
     @Test
     void testGetCommonFilms() {
-        LikesDbStorage likeStorage = new LikesDbStorage(jdbcTemplate, genreStorage, directorDbStorage);
-        DirectorDbStorage directorDbStorage = new DirectorDbStorage(jdbcTemplate, genreStorage);
-        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate, likeStorage, directorDbStorage, genreStorage);
-        UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
 
         // Подготавливаем данные для теста
         Film newFilm1 = new Film(

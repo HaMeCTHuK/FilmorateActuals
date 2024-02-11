@@ -20,24 +20,21 @@ import static org.junit.jupiter.api.Assertions.*;
 class LikesDbStorageTest {
 
     private final JdbcTemplate jdbcTemplate;
-    private DirectorDbStorage directorDbStorage;
     private LikesDbStorage likeStorage;
     private FilmDbStorage filmStorage;
     private UserDbStorage userStorage;
-    private GenreDbStorage genreStorage;
 
     @BeforeEach
     void init() {
-        genreStorage = new GenreDbStorage(jdbcTemplate);
-        directorDbStorage = new DirectorDbStorage(jdbcTemplate, genreStorage);
-        likeStorage = new LikesDbStorage(jdbcTemplate, genreStorage, directorDbStorage);
+        GenreDbStorage genreStorage = new GenreDbStorage(jdbcTemplate);
+        DirectorDbStorage directorDbStorage = new DirectorDbStorage(jdbcTemplate);
+        likeStorage = new LikesDbStorage(jdbcTemplate);
         filmStorage = new FilmDbStorage(jdbcTemplate, likeStorage, directorDbStorage, genreStorage);
         userStorage = new UserDbStorage(jdbcTemplate);
     }
 
     @Test
     void addLike() {
-        LikesDbStorage likesDbStorage = new LikesDbStorage(jdbcTemplate, genreStorage, directorDbStorage);
 
         Film newFilm = new Film(
                 "testFilm2",
@@ -65,10 +62,10 @@ class LikesDbStorageTest {
         // Добавляем лайк
         Long filmId = createdFilm.getId();
         Long userId = createdUser.getId();
-        likesDbStorage.addLike(filmId, userId);
+        likeStorage.addLike(filmId, userId);
 
         // Проверяем лайк
-        long likesCount = likesDbStorage.getLikesCountForFilm(filmId);
+        long likesCount = likeStorage.getLikesCountForFilm(filmId);
         assertEquals(1, likesCount);
     }
 
