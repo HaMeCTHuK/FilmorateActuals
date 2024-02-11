@@ -12,7 +12,7 @@ import java.util.List;
 @Slf4j
 @Component
 public class ReviewEvents implements Events {
-    EventsStorage eventsStorage;
+    private final EventsStorage eventsStorage;
 
     @Autowired
     public ReviewEvents(EventsStorage eventsStorage) {

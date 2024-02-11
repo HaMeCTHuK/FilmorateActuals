@@ -90,8 +90,9 @@ public class DirectorService extends AbstractService<Director> {
         }
     }
 
+    //В данной реализации метод не используется
     @Override
     public void validateParameters(Long id, Long otherId) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Метод не используется");
     }
 }
