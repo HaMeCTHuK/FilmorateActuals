@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.model.Director;
 import ru.java.practicum.filmorate.model.Film;
-import ru.java.practicum.filmorate.model.Genre;
 import ru.java.practicum.filmorate.storage.DirectorStorage;
 
 import java.sql.ResultSet;
@@ -28,47 +27,48 @@ public class DirectorDbStorage implements DirectorStorage {
     // Метод получения списка фильмов режисера с сортировкой по году
     @Override
     public List<Film> getSortedDirectorListByYear(Long directorId) {
-        String query = "SELECT films.*, m.rating_name AS mpa_rating_name, m.id AS mpa_rating_id FROM films " +
-                "JOIN film_director ON films.id = film_director.film_id " +
-                "LEFT JOIN MPARating m ON films.mpa_rating_id = m.id " +
-                "WHERE film_director.director_id = ? ORDER BY films.release_date";
+        String query = "SELECT f.*, " +
+                "m.rating_name AS mpa_rating_name, " +
+                "m.id AS mpa_rating_id, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(g.id, ':', g.genre_name)) AS genres, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(d.id, ':', d.director_name)) AS directors, " +
+                "COUNT(l.film_id) AS like_count " +
+                "FROM films f " +
+                "JOIN film_director fd ON f.id = fd.film_id " +
+                "LEFT JOIN MPARating m ON f.mpa_rating_id = m.id " +
+                "LEFT JOIN FILM_GENRE fg ON f.id = fg.film_id " +
+                "LEFT JOIN GENRES g ON fg.genre_id = g.id " +
+                "LEFT JOIN DIRECTORS d ON fd.director_id = d.id " +
+                "LEFT JOIN LIKES l ON f.id = l.film_id " +
+                "WHERE fd.director_id = ? " +
+                "GROUP BY f.id " +
+                "ORDER BY f.release_date";
 
         List<Film> films = jdbcTemplate.query(query, FilmDbStorage::createFilm, directorId);
 
-        // Добавляем жанры и режиссеров к каждому фильму
-        for (Film film : films) {
-            List<Genre> genres = genreDbStorage.getGenresForFilm(film.getId());
-            List<Director> directors = getDirectorsForFilm(film.getId());
-
-            film.setGenres(genres);
-            film.setDirectors(directors);
-            film.setLikes(getLikesCountForFilm((film.getId())));
-        }
         return films;
     }
 
     // Метод получения списка фильмов режисера с сортировкой по лайкам
     @Override
     public List<Film> getSortedDirectorListByLikes(Long directorId) {
-        String query = "SELECT films.*, COUNT(likes.film_id) AS like_count, m.rating_name AS mpa_rating_name, m.id AS mpa_rating_id " +
-                "FROM films " +
-                "JOIN film_director ON films.id = film_director.film_id " +
-                "LEFT JOIN likes ON films.id = likes.film_id " +
-                "LEFT JOIN MPARating m ON films.mpa_rating_id = m.id " +
-                "WHERE film_director.director_id = ? " +
-                "GROUP BY films.id " +
+        String query = "SELECT f.*, " +
+                "COUNT(likes.film_id) AS like_count, " +
+                "m.rating_name AS mpa_rating_name, " +
+                "m.id AS mpa_rating_id, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(g.id, ':', g.genre_name)) AS genres, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(d.id, ':', d.director_name)) AS directors " +
+                "FROM films f " +
+                "LEFT JOIN likes ON f.id = likes.film_id " +
+                "LEFT JOIN MPARating m ON f.mpa_rating_id = m.id " +
+                "LEFT JOIN FILM_GENRE fg ON f.id = fg.film_id " +
+                "LEFT JOIN GENRES g ON fg.genre_id = g.id " +
+                "LEFT JOIN FILM_DIRECTOR fd ON f.id = fd.film_id " +
+                "LEFT JOIN DIRECTORS d ON fd.director_id = d.id " +
+                "WHERE fd.director_id = ? " +
+                "GROUP BY f.id " +
                 "ORDER BY like_count DESC";
         List<Film> films = jdbcTemplate.query(query, FilmDbStorage::createFilm, directorId);
-
-        // Добавляем жанры и режиссеров к каждому фильму
-        for (Film film : films) {
-            List<Genre> genres = genreDbStorage.getGenresForFilm(film.getId());
-            List<Director> directors = getDirectorsForFilm(film.getId());
-
-            film.setGenres(genres);
-            film.setDirectors(directors);
-            film.setLikes(getLikesCountForFilm((film.getId())));
-        }
 
         return films;
     }

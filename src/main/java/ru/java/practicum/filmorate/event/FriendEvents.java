@@ -31,9 +31,10 @@ public class FriendEvents implements Events {
         eventsStorage.addEvent(userId, entityId, EventType.FRIEND, EventOperation.REMOVE);
     }
 
+    //Не используется в текущей реализации
     @Override
     public void update(Long userId, Long entityId) {
-
+        throw new UnsupportedOperationException("Метод не используется");
     }
 
     @Override

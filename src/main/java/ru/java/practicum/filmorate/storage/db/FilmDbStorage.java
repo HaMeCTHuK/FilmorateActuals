@@ -59,7 +59,6 @@ public class FilmDbStorage implements FilmStorage {
     // Метод для обновления существующего фильма
     @Override
     public Film update(Film film) {
-        //film.setMpa(getMpaRatingById(film.getMpa().getId()));
         String sql = "UPDATE FILMS " +
                 "SET NAME=?, " +
                 "DESCRIPTION=?, " +
@@ -117,19 +116,21 @@ public class FilmDbStorage implements FilmStorage {
     // Метод для получения списка всех фильмов
     @Override
     public List<Film> getAll() {
-        String sql = "SELECT f.*, m.rating_name AS mpa_rating_name " +
+        String sql = "SELECT f.*, " +
+                "m.rating_name AS mpa_rating_name, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(g.id, ':', g.genre_name)) AS genres, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(d.id, ':', d.director_name)) AS directors, " +
+                "COUNT(l.film_id) AS like_count " +
                 "FROM FILMS f " +
-                "LEFT JOIN MPARating m ON f.mpa_rating_id = m.id";
-        List<Film> films = jdbcTemplate.query(sql, FilmDbStorage::createFilm);
+                "LEFT JOIN FILM_GENRE fg ON f.id = fg.film_id " +
+                "LEFT JOIN GENRES g ON fg.genre_id = g.id " +
+                "LEFT JOIN LIKES l ON f.id = l.film_id " +
+                "LEFT JOIN FILM_DIRECTOR fd ON f.id = fd.film_id " +
+                "LEFT JOIN DIRECTORS d ON fd.director_id = d.id " +
+                "LEFT JOIN MPARating m ON f.mpa_rating_id = m.id " +
+                "GROUP BY f.id";
 
-        // Добавляем жанры, лайки и режиссеров к каждому фильму
-        for (Film film : films) {
-            List<Genre> genres = genreDbStorage.getGenresForFilm(film.getId());
-            List<Director> directors = directorDbStorage.getDirectorsForFilm(film.getId());
-            film.setLikes((likesStorage.getLikesCountForFilm(film.getId())));
-            film.setGenres(genres);
-            film.setDirectors(directors);
-        }
+        List<Film> films = jdbcTemplate.query(sql, FilmDbStorage::createFilm);
 
         return films;
     }
@@ -277,19 +278,52 @@ public class FilmDbStorage implements FilmStorage {
         return params;
     }
 
-    // Вспомогательный метод для создания объекта Film из ResultSet
     public static Film createFilm(ResultSet rs, int rowNum) throws SQLException {
+        log.info("Создаем объект Film после запроса к БД");
+
         Mpa mpa = createMpa(rs, rowNum);
 
-        return Film.builder()
+        // Извлекаем строку с жанрами и режиссерами
+        String genresString = rs.getString("genres");
+        String directorsString = rs.getString("directors");
+
+        // Создаем список жанров
+        List<Genre> genres = new ArrayList<>();
+        if (genresString != null && !genresString.isEmpty() && !genresString.equals(":")) {
+            String[] genreParts = genresString.split(",");
+            for (String part : genreParts) {
+                String[] parts = part.split(":");
+                Genre genre = new Genre().builder().id(Long.parseLong(parts[0])).name(parts[1]).build();
+                genres.add(genre);
+            }
+        }
+
+        // Создаем список режиссеров
+        List<Director> directors = new ArrayList<>();
+        if (directorsString != null && !directorsString.isEmpty() && !directorsString.equals(":")) {
+            String[] directorParts = directorsString.split(",");
+            for (String part : directorParts) {
+                String[] parts = part.split(":");
+                Director director = new Director().builder().id(Long.parseLong(parts[0])).name(parts[1]).build();
+                directors.add(director);
+            }
+        }
+
+        // Создаем объект Film
+        Film film = Film.builder()
                 .id(rs.getLong("id"))
                 .name(rs.getString("name"))
                 .description(rs.getString("description"))
                 .releaseDate(rs.getDate("release_date").toLocalDate())
                 .duration(rs.getInt("duration"))
                 .rating(rs.getInt("rating"))
+                .likes(rs.getLong("like_count"))
                 .mpa(mpa)
+                .genres(genres)
+                .directors(directors)
                 .build();
+
+        return film;
     }
 
     // Метод для получения информации о MPA рейтинге по его идентификатору
@@ -344,121 +378,148 @@ public class FilmDbStorage implements FilmStorage {
     //Метод для получения списка самых популярных фильмов указанного жанра за нужный год.
     @Override
     public List<Film> getPopularWithYearForYear(int limit, long genreId, int year) {
-        String popWithYearFilmsSql = "SELECT f.*, m.rating_name AS mpa_rating_name " +
+        String popWithYearFilmsSql = "SELECT f.*, " +
+                "m.rating_name AS mpa_rating_name, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(g.id, ':', g.genre_name)) AS genres, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(d.id, ':', d.director_name)) AS directors, " +
+                "COUNT(l.film_id) AS like_count " +
                 "FROM FILMS f " +
                 "LEFT JOIN MPARating m ON f.mpa_rating_id = m.id " +
+                "LEFT JOIN FILM_GENRE fg ON f.id = fg.film_id " +
+                "LEFT JOIN GENRES g ON fg.genre_id = g.id " +
+                "LEFT JOIN LIKES l ON f.id = l.film_id " +
+                "LEFT JOIN FILM_DIRECTOR fd ON f.id = fd.film_id " +
+                "LEFT JOIN DIRECTORS d ON fd.director_id = d.id " +
                 "WHERE EXTRACT(YEAR FROM f.release_date) = ? " +
+                "GROUP BY f.id " +
                 "LIMIT ?";
 
         List<Film> films = jdbcTemplate.query(popWithYearFilmsSql, FilmDbStorage::createFilm, year, limit);
 
-        // Добавляем жанры и режиссеров к каждому фильму
-        for (Film film : films) {
-            List<Genre> genres = genreDbStorage.getGenresForFilm(film.getId());
-            List<Director> directors = directorDbStorage.getDirectorsForFilm(film.getId());
-            film.setLikes((likesStorage.getLikesCountForFilm(film.getId())));
-            film.setGenres(genres);
-            film.setDirectors(directors);
-
-        }
         return films;
     }
 
     // Метод для получения списка самых популярных фильмов указанного жанра
     @Override
     public List<Film> getPopularWithGenre(int limit, Long genreId) {
-        String popWithGenreFilmsSql = "SELECT f.*, m.rating_name AS mpa_rating_name " +
+        String popWithGenreFilmsSql = "SELECT f.*, " +
+                "m.rating_name AS mpa_rating_name, " +
+                "(" +
+                "SELECT GROUP_CONCAT(CONCAT(g.id, ':', g.genre_name)) " +
+                "FROM GENRES g " +
+                "JOIN FILM_GENRE fg ON g.id = fg.genre_id " +
+                "WHERE fg.film_id = f.id" +
+                ") AS genres, " +
+                "(" +
+                "SELECT GROUP_CONCAT(CONCAT(d.id, ':', d.director_name)) " +
+                "FROM DIRECTORS d " +
+                "JOIN FILM_DIRECTOR fd ON d.id = fd.director_id " +
+                "WHERE fd.film_id = f.id" +
+                ") AS directors, " +
+                "COUNT(l.film_id) AS like_count " +
                 "FROM FILMS f " +
                 "LEFT JOIN MPARating m ON f.mpa_rating_id = m.id " +
+                "LEFT JOIN LIKES l ON f.id = l.film_id " +
                 "LEFT JOIN FILM_GENRE fg ON f.id = fg.film_id " +
+                "LEFT JOIN FILM_DIRECTOR fd ON f.id = fd.film_id " +
                 "WHERE fg.genre_id = ? " +
-                "LIMIT ?";
+                "GROUP BY f.id " +
+                "ORDER BY like_count DESC " +
+                "LIMIT ?;";
 
         List<Film> films = jdbcTemplate.query(popWithGenreFilmsSql, FilmDbStorage::createFilm, genreId, limit);
 
-        // Добавляем жанры и режиссеров к каждому фильму
-        for (Film film : films) {
-            List<Genre> genres = genreDbStorage.getGenresForFilm(film.getId());
-            List<Director> directors = directorDbStorage.getDirectorsForFilm(film.getId());
-            film.setLikes((likesStorage.getLikesCountForFilm(film.getId())));
-            film.setDirectors(directors);
-            film.setGenres(genres);
-        }
         return films;
     }
 
     // Метод для получения списка самых популярных фильмов за нужный год.
     @Override
     public List<Film> getPopularWithYear(int limit, Integer year) {
-        String popWithYearFilmsSql = "SELECT f.*, m.rating_name AS mpa_rating_name " +
+        String popWithYearFilmsSql = "SELECT f.*, " +
+                "m.rating_name AS mpa_rating_name, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(g.id, ':', g.genre_name)) AS genres, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(d.id, ':', d.director_name)) AS directors, " +
+                "COUNT(l.film_id) AS like_count " +
                 "FROM FILMS f " +
                 "LEFT JOIN MPARating m ON f.mpa_rating_id = m.id " +
-                "WHERE EXTRACT(YEAR FROM f.release_date) = ?" +
+                "LEFT JOIN FILM_GENRE fg ON f.id = fg.film_id " +
+                "LEFT JOIN GENRES g ON fg.genre_id = g.id " +
+                "LEFT JOIN LIKES l ON f.id = l.film_id " +
+                "LEFT JOIN FILM_DIRECTOR fd ON f.id = fd.film_id " +
+                "LEFT JOIN DIRECTORS d ON fd.director_id = d.id " +
+                "WHERE EXTRACT(YEAR FROM f.release_date) = ? " +
+                "GROUP BY f.id " +
                 "LIMIT ?";
 
         List<Film> films = jdbcTemplate.query(popWithYearFilmsSql, FilmDbStorage::createFilm, year, limit);
 
-        // Добавляем жанры и режиссеров к каждому фильму
-        for (Film film : films) {
-            List<Genre> genres = genreDbStorage.getGenresForFilm(film.getId());
-            List<Director> directors = directorDbStorage.getDirectorsForFilm(film.getId());
-            film.setLikes((likesStorage.getLikesCountForFilm(film.getId())));
-            film.setGenres(genres);
-            film.setDirectors(directors);
-        }
         return films;
     }
 
     // Метод для поиска фильма по запросу
-    @Override
+/*    @Override
     public List<Film> searchFilmsByQuery(String query, String by) {
-        String sql = "SELECT f.*, m.rating_name AS mpa_rating_name FROM FILMS f " +
+        String sql = "SELECT f.*, " +
+                "m.rating_name AS mpa_rating_name, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(g.id, ':', g.genre_name)) AS genres, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(d.id, ':', d.director_name)) AS directors, " +
+                "COUNT(l.film_id) AS like_count " +
+                "FROM FILMS f " +
                 "LEFT JOIN MPARating m ON f.mpa_rating_id = m.id " +
-                "LEFT JOIN FILM_DIRECTOR fd ON f.ID = fd.FILM_ID " +
-                "LEFT JOIN DIRECTORS d ON fd.DIRECTOR_ID = d.ID ";
+                "LEFT JOIN FILM_GENRE fg ON f.id = fg.film_id " +
+                "LEFT JOIN GENRES g ON fg.genre_id = g.id " +
+                "LEFT JOIN LIKES l ON f.id = l.film_id " +
+                "LEFT JOIN FILM_DIRECTOR fd ON f.id = fd.film_id " +
+                "LEFT JOIN DIRECTORS d ON fd.DIRECTOR_ID = d.ID " +
+                "GROUP BY f.id ";
 
         if (by.equals("title")) {
-            List<Film> films = jdbcTemplate.query(sql + "WHERE LOWER(f.NAME) LIKE ?", FilmDbStorage::createFilm, query);
-            // Добавляем жанры и режиссеров к каждому фильму
-            for (Film film : films) {
-                List<Genre> genres = genreDbStorage.getGenresForFilm(film.getId());
-                List<Director> directors = directorDbStorage.getDirectorsForFilm(film.getId());
-                film.setLikes(likesStorage.getLikesCountForFilm(film.getId()));
-                film.setGenres(genres);
-                film.setDirectors(directors);
-            }
+            List<Film> films = jdbcTemplate.query(sql + " WHERE LOWER(f.NAME) LIKE ?", FilmDbStorage::createFilm, query);
+
             return films;
         }
         if (by.equals("director")) {
-            List<Film> films = jdbcTemplate.query(sql + "WHERE LOWER(d.DIRECTOR_NAME) LIKE ?",
+            List<Film> films = jdbcTemplate.query(sql + " WHERE LOWER(d.DIRECTOR_NAME) LIKE ?",
                     FilmDbStorage::createFilm, query);
 
-            // Добавляем жанры и режиссеров к каждому фильму
-            for (Film film : films) {
-                List<Genre> genres = genreDbStorage.getGenresForFilm(film.getId());
-                List<Director> directors = directorDbStorage.getDirectorsForFilm(film.getId());
-                film.setLikes(likesStorage.getLikesCountForFilm(film.getId()));
-                film.setGenres(genres);
-                film.setDirectors(directors);
-            }
             return films;
         }
         if (by.equals("title,director") || by.equals("director,title")) {
-            List<Film> films = jdbcTemplate.query(sql + "WHERE LOWER(f.NAME) LIKE ? OR LOWER(d.DIRECTOR_NAME) LIKE ?",
+            List<Film> films = jdbcTemplate.query(sql + " WHERE LOWER(f.NAME) LIKE ? OR LOWER(d.DIRECTOR_NAME) LIKE ?",
                     FilmDbStorage::createFilm, query, query);
 
-            // Добавляем жанры и режиссеров к каждому фильму
-            for (Film film : films) {
-                List<Genre> genres = genreDbStorage.getGenresForFilm(film.getId());
-                List<Director> directors = directorDbStorage.getDirectorsForFilm(film.getId());
-                film.setLikes(likesStorage.getLikesCountForFilm(film.getId()));
-                film.setGenres(genres);
-                film.setDirectors(directors);
-            }
             return films;
         }
         //Если совподений нет, возвращаем пустой список
         return new ArrayList<>();
+    }*/
+    @Override
+    public List<Film> searchFilmsByQuery(String query, String by) {
+        String sql = "SELECT f.*, " +
+                "m.rating_name AS mpa_rating_name, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(g.id, ':', g.genre_name)) AS genres, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(d.id, ':', d.director_name)) AS directors, " +
+                "COUNT(l.film_id) AS like_count " +
+                "FROM FILMS f " +
+                "LEFT JOIN MPARating m ON f.mpa_rating_id = m.id " +
+                "LEFT JOIN FILM_GENRE fg ON f.id = fg.film_id " +
+                "LEFT JOIN GENRES g ON fg.genre_id = g.id " +
+                "LEFT JOIN LIKES l ON f.id = l.film_id " +
+                "LEFT JOIN FILM_DIRECTOR fd ON f.id = fd.film_id " +
+                "LEFT JOIN DIRECTORS d ON fd.DIRECTOR_ID = d.ID " +
+                "GROUP BY f.id ";
+
+        String whereClause = "";
+        if (by.equals("title")) {
+            whereClause = " WHERE LOWER(f.NAME) LIKE ?";
+        } else if (by.equals("director")) {
+            whereClause = " WHERE LOWER(d.DIRECTOR_NAME) LIKE ?";
+        } else if (by.equals("title,director") || by.equals("director,title")) {
+            whereClause = " HAVING LOWER(f.NAME) LIKE ? OR LOWER(d.DIRECTOR_NAME) LIKE ?";
+        }
+
+        List<Film> films = jdbcTemplate.query(sql + whereClause, FilmDbStorage::createFilm, query);
+        return films;
     }
 
     // Метод получения общих фильмов пользователей

@@ -47,7 +47,7 @@ public class ReviewService {
         return reviewStorage.findReviewById(id);
     }
 
-    public List<Review> getReviewsOfFilm(long filmId, int count) {
+    public List<Review> getReviewsOfFilm(Long filmId, int count) {
 
         return reviewStorage.getReviewsOfFilm(filmId, count);
     }

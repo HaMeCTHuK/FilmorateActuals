@@ -9,7 +9,6 @@ import ru.java.practicum.filmorate.model.Director;
 import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.storage.DirectorStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,21 +30,17 @@ public class DirectorService extends AbstractService<Director> {
             throw new IncorrectParameterException("Некорректное значение sortBy: null");
         }
         log.info("Получаем список фильмов режиссера отсортированных по {}", sortBy);
-        List<Film> films = new ArrayList<>();
 
-        if ("year".equals(sortBy)) {
+        switch (sortBy) {
+        case "year":
             // Сортировка по году выпуска
-            films = storage.getSortedDirectorListByYear(directorId);
-
-        } else if ("likes".equals(sortBy)) {
+            return storage.getSortedDirectorListByYear(directorId);
+        case "likes":
             // Сортировка по количеству лайков
-            films = storage.getSortedDirectorListByLikes(directorId);
-
-        } else {
+            return storage.getSortedDirectorListByLikes(directorId);
+        default:
             throw new IncorrectParameterException("Некорректное задание сортировки");
         }
-
-        return films;
     }
 
     @Override

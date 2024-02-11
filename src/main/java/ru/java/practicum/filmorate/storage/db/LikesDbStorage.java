@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import ru.java.practicum.filmorate.exception.DataNotFoundException;
 import ru.java.practicum.filmorate.model.Director;
 import ru.java.practicum.filmorate.model.Film;
 import ru.java.practicum.filmorate.model.Genre;
@@ -13,9 +12,7 @@ import ru.java.practicum.filmorate.storage.LikesStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -56,122 +53,64 @@ public class LikesDbStorage implements LikesStorage {
         return jdbcTemplate.queryForList(sql, Long.class, userId);
     }
 
-/*    // Метод для получения списка фильмов с наибольшим количеством лайков
+    // Метод для получения списка фильмов с наибольшим количеством лайков
     @Override
     public List<Film> getPopularFilms(int count) {
         log.info("Отправляем запрос в БД для получения залайканых фильмов");
         String sql = "SELECT f.*, " +
                 "m.rating_name AS mpa_rating_name, " +
                 "f.mpa_rating_id, " +
-                "g.genre_name, " +
-                "fg.genre_id, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(g.id, ':', g.genre_name)) AS genres, " +
+                "GROUP_CONCAT(DISTINCT CONCAT(d.id, ':', d.director_name)) AS directors, " +
                 "COUNT(l.film_id) AS like_count " +
                 "FROM FILMS f " +
                 "LEFT JOIN MPARating m ON f.mpa_rating_id = m.id " +
                 "LEFT JOIN FILM_GENRE fg ON f.id = fg.film_id " +
                 "LEFT JOIN GENRES g ON fg.genre_id = g.id " +
                 "LEFT JOIN LIKES l ON f.id = l.film_id " +
-                "GROUP BY f.id, m.rating_name, m.id, g.genre_name, fg.genre_id " +
+                "LEFT JOIN FILM_DIRECTOR fd ON f.id = fd.film_id " +
+                "LEFT JOIN DIRECTORS d ON fd.director_id = d.id " +
+                "GROUP BY f.id, m.rating_name, m.id " +
                 "ORDER BY like_count DESC " +
-                "LIMIT ?;";
+                "LIMIT ?";
 
         List<Film> films = jdbcTemplate.query(sql, LikesDbStorage::createFilmWithLikes, count);
 
-        // Добавляем жанры и режиссеров к каждому фильму
-        for (Film film : films) {
-            List<Genre> genres = genreDbStorage.getGenresForFilm(film.getId());
-            List<Director> directors = directorDbStorage.getDirectorsForFilm(film.getId());
-
-            film.setGenres(genres);
-            film.setDirectors(directors);
-        }
-        return films;
-    }*/
-    @Override
-    public List<Film> getPopularFilms(int count) {
-        log.info("Отправляем запрос в БД для получения залайканых фильмов");
-        String sql = "SELECT f.*, " +
-            "m.rating_name AS mpa_rating_name, " +
-            "f.mpa_rating_id, " +
-            "g.genre_name, " +
-            "fg.genre_id, " +
-            "COUNT(l.film_id) AS like_count, " +
-            "GROUP_CONCAT(DISTINCT g.genre_name) AS genre_names, " +
-            "GROUP_CONCAT(DISTINCT d.director_name) AS director_names " +
-            "FROM FILMS f " +
-            "LEFT JOIN MPARating m ON f.mpa_rating_id = m.id " +
-            "LEFT JOIN FILM_GENRE fg ON f.id = fg.film_id " +
-            "LEFT JOIN GENRES g ON fg.genre_id = g.id " +
-            "LEFT JOIN FILM_DIRECTOR fd ON f.id = fd.film_id " +
-            "LEFT JOIN DIRECTORS d ON fd.director_id = d.id " +
-            "LEFT JOIN LIKES l ON f.id = l.film_id " +
-            "GROUP BY f.id, m.rating_name, m.id, g.genre_name, fg.genre_id " +
-            "ORDER BY like_count DESC " +
-            "LIMIT ?;";
-
-        List<Film> films = setGenresAndDirectorsForFilmsWithCount(sql,count);
-
         return films;
     }
 
+    public List<Genre> getGenresForFilm(String sql) {
 
-    private List<Genre> getGenresForFilm(Long filmId) {
-        String genresSql = "SELECT g.* " +
-                "FROM FILM_GENRE fg " +
-                "JOIN GENRES g ON fg.genre_id = g.id " +
-                "WHERE fg.film_id = ?;";
-        try {
-            return jdbcTemplate.query(genresSql, LikesDbStorage::createGenre, filmId);
-        } catch (DataNotFoundException e) {
-            // Если жанров нет, возвращаем пустой список
-            return Collections.emptyList();
-        }
-    }
-
-    public List<Film> setGenresAndDirectorsForFilmsWithCount(String sql, Integer count) {
-        List<Film> films = jdbcTemplate.query(sql, (resultSet, i) -> {
-            Film film = LikesDbStorage.createFilmWithLikes(resultSet, i);
-            String genreNames = resultSet.getString("genre_names");
-            if (genreNames != null) {
-                List<Genre> genres = Arrays.stream(genreNames.split(","))
-                        .map(Genre::new)
-                        .collect(Collectors.toList());
-                film.setGenres(genres);
+        return jdbcTemplate.query(sql, rs -> {
+            String genresString = rs.next() ? rs.getString("genres") : "";
+            if (genresString.isEmpty() || genresString.equals(":") ) {
+                return Collections.emptyList();
             }
-            String directorNames = resultSet.getString("director_names");
-            if (directorNames != null) {
-                List<Director> directors = Arrays.stream(directorNames.split(","))
-                        .map(Director::new)
-                        .collect(Collectors.toList());
-                film.setDirectors(directors);
-            }
-            return film;
-        }, count);
-
-        return films;
-    }
-
-    public List<Film> setGenresAndDirectorsForFilmsWithoutCount(String sql) {
-        List<Film> films = jdbcTemplate.query(sql, (resultSet, i) -> {
-            Film film = LikesDbStorage.createFilmWithLikes(resultSet, i);
-            String genreNames = resultSet.getString("genre_names");
-            if (genreNames != null) {
-                List<Genre> genres = Arrays.stream(genreNames.split(","))
-                        .map(Genre::new)
-                        .collect(Collectors.toList());
-                film.setGenres(genres);
-            }
-            String directorNames = resultSet.getString("director_names");
-            if (directorNames != null) {
-                List<Director> directors = Arrays.stream(directorNames.split(","))
-                        .map(Director::new)
-                        .collect(Collectors.toList());
-                film.setDirectors(directors);
-            }
-            return film;
+            return Arrays.stream(genresString.split(","))
+                    .map(genre -> {
+                        String[] parts = genre.split(":");
+                        return new Genre().builder().id(Long.parseLong(parts[0])).name(parts[1]).build();
+                    })
+                    .collect(Collectors.toList());
         });
+    }
 
-        return films;
+    public List<Director> getDirectorsForFilm(String sql) {
+        Map<Long, List<Genre>> filmGenresMap = new HashMap<>();
+
+        return jdbcTemplate.query(sql, rs -> {
+            String directorsString = rs.next() ? rs.getString("directors") : "";
+            if (directorsString.isEmpty() || directorsString.equals(":")) {
+                return Collections.emptyList();
+            }
+            return Arrays.stream(directorsString.split(","))
+                    .map(director -> {
+                        String[] parts = director.split(":");
+                        //return new Director(Long.parseLong(parts[0]), parts[1]);
+                        return new Director().builder().id(Long.parseLong(parts[0])).name(parts[1]).build();
+                    })
+                    .collect(Collectors.toList());
+        });
     }
 
     // Вспомогательный метод для создания объекта Genre из ResultSet
@@ -179,6 +118,14 @@ public class LikesDbStorage implements LikesStorage {
         return Genre.builder()
                 .id(rs.getLong("genre_id"))
                 .name(rs.getString("genre_name"))
+                .build();
+    }
+
+    // Вспомогательный метод для создания объекта Director из ResultSet
+    static Director createDirector(ResultSet rs, int rowNum) throws SQLException {
+        return Director.builder()
+                .id(rs.getLong("id"))
+                .name(rs.getString("director_name"))
                 .build();
     }
 
@@ -195,9 +142,33 @@ public class LikesDbStorage implements LikesStorage {
 
         Mpa mpa = createMpa(rs, rowNum);
 
-        Long genreId = rs.getLong("genre_id");
-        Genre genre = genreId != 0 ? createGenre(rs, rowNum) : null;
+        // Извлекаем строку с жанрами и режиссерами
+        String genresString = rs.getString("genres");
+        String directorsString = rs.getString("directors");
 
+        // Создаем список жанров
+        List<Genre> genres = new ArrayList<>();
+        if (genresString != null && !genresString.isEmpty() && !genresString.equals(":")) {
+            String[] genreParts = genresString.split(",");
+            for (String part : genreParts) {
+                String[] parts = part.split(":");
+                Genre genre = new Genre().builder().id(Long.parseLong(parts[0])).name(parts[1]).build();
+                genres.add(genre);
+            }
+        }
+
+        // Создаем список режиссеров
+        List<Director> directors = new ArrayList<>();
+        if (directorsString != null && !directorsString.isEmpty() && !directorsString.equals(":")) {
+            String[] directorParts = directorsString.split(",");
+            for (String part : directorParts) {
+                String[] parts = part.split(":");
+                Director director = new Director().builder().id(Long.parseLong(parts[0])).name(parts[1]).build();
+                directors.add(director);
+            }
+        }
+
+        // Создаем объект Film
         Film film = Film.builder()
                 .id(rs.getLong("id"))
                 .name(rs.getString("name"))
@@ -207,7 +178,8 @@ public class LikesDbStorage implements LikesStorage {
                 .rating(rs.getInt("rating"))
                 .likes(rs.getLong("like_count"))
                 .mpa(mpa)
-                .genres(genre != null ? Collections.singletonList(genre) : Collections.emptyList())
+                .genres(genres)
+                .directors(directors)
                 .build();
 
         return film;

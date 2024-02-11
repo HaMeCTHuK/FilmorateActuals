@@ -117,11 +117,11 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     // Метод для получения списка отзывов о фильме из базы данных.
-    public List<Review> getReviewsOfFilm(long filmId, int count) {
+    public List<Review> getReviewsOfFilm(Long filmId, int count) {
 
         String queryWithFilmId = "SELECT * FROM REVIEW WHERE FILM_ID = ? ORDER BY USEFUL DESC LIMIT ?";
         String queryWithoutFilmId = "SELECT * FROM REVIEW ORDER BY USEFUL DESC LIMIT ?";
-        if (filmId == 0) {
+        if (filmId == null) {
             return jdbcTemplate.query(queryWithoutFilmId, this::mapRowToReview, count);
         }
         return jdbcTemplate.query(queryWithFilmId, this::mapRowToReview, filmId, count);
