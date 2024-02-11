@@ -14,6 +14,10 @@ import javax.validation.constraints.NotBlank;
 public class Director extends BaseUnit {
 
     @NotBlank
-    String name;
+    private String name;
+
+    public Director(String name) {
+        this.name = name;
+    }
 
 }

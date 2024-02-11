@@ -75,10 +75,9 @@ public class FilmController {
     // Если значение параметра count не задано, верните первые 10.
     //Объединил старый метод и необходимую новую реализацию методов
     @GetMapping("/popular")
-    public List<Film> getPopularWithYearForYear(@RequestParam(required = false, defaultValue = "10") int count,
+    public List<Film> getPopularWithYearForYear(@RequestParam(defaultValue = "10") int count,
                                                 @RequestParam(required = false) Long genreId,
-                                                @RequestParam(required = false) Integer year,
-                                                @RequestParam(required = false, defaultValue = "10") int limit) {
+                                                @RequestParam(required = false) Integer year) {
 
         if (genreId == null && year == null) {
             // Обработка запроса /films/popular?count={count}
@@ -90,24 +89,24 @@ public class FilmController {
             // Обработка случая, когда параметр year не указан в запросе
             log.info("Получили запрос на получение списка" +
                     " самых популярных фильмов указанного жанра с айди = {}", genreId);
-            return filmService.getPopularWithGenre(limit, genreId);
+            return filmService.getPopularWithGenre(count, genreId);
         }
 
         if (genreId == null) {
             // Обработка случая, когда параметр genreId не указан в запросе
             log.info("Получили запрос на получение списка" +
                     " самых популярных фильмов за нужный год = {}.", year);
-            return filmService.getPopularWithYear(limit, year);
+            return filmService.getPopularWithYear(count, year);
         }
 
         log.info("Получили запрос на получение списка размером = {}," +
-                " самых популярных фильмов указанного жанра с айди = {} за нужный год = {}.", limit, genreId, year);
+                " самых популярных фильмов указанного жанра с айди = {} за нужный год = {}.", count, genreId, year);
         // Обработка случая, когда указаны все параметры
-        return filmService.getPopularWithYearForYear(limit, genreId, year);
+        return filmService.getPopularWithYearForYear(count, genreId, year);
     }
 
     @GetMapping("/search") //после поиска пользователю выдается список фильмов по популярности
-    public List<Film> searchFilmsByQuery2(@RequestParam String query, @RequestParam String by) {
+    public List<Film> searchFilmsByQuery(@RequestParam String query, @RequestParam String by) {
         log.info("Вызван метод getFilmsByQuery - поиск фильмов по названию и/или режиссеру" +
                 " с query " + query + " с by " + by);
         return filmService.searchFilmsByQuery(query, by);
@@ -117,7 +116,7 @@ public class FilmController {
     @DeleteMapping("/{filmId}")
     public void deleteUserById(@PathVariable Long filmId) {
         log.info("Удаляем фильм по ID: " + filmId);
-        filmService.delete(filmId);
+        filmService.deleteFilmById(filmId);
     }
 
     //GET /films/common?userId={userId}&friendId={friendId} - вывод общих с другом фильмов с сортировкой по их популярности

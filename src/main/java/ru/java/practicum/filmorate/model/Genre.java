@@ -14,4 +14,8 @@ import javax.validation.constraints.NotBlank;
 public class Genre extends BaseUnit {
     @NotBlank
     private String name;
+
+    public Genre(String name) {
+        this.name = name;
+    }
 }

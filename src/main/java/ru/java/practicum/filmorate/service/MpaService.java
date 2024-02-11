@@ -23,18 +23,21 @@ public class MpaService extends AbstractService<Mpa> {
         return abstractStorage.get(id);
     }
 
+    //В данной реализации метод не используется
     @Override
     public void validate(Mpa data) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Метод не используется");
     }
 
+    //В данной реализации метод не используется
     @Override
     public void validateParameter(Long id) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Метод не используется");
     }
 
+    //В данной реализации метод не используется
     @Override
     public void validateParameters(Long id, Long otherId) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Метод не используется");
     }
 }

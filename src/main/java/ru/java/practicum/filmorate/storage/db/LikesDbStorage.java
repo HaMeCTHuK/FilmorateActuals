@@ -13,8 +13,10 @@ import ru.java.practicum.filmorate.storage.LikesStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -44,10 +46,7 @@ public class LikesDbStorage implements LikesStorage {
     public long getLikesCountForFilm(Long filmId) {
         String sql = "SELECT COUNT(*) FROM LIKES WHERE film_id = ?";
         Long count = jdbcTemplate.queryForObject(sql, Long.class, filmId);
-        if (count == null) {
-            return 0L;
-        }
-        return count;
+        return count != null ? count : 0L;
     }
 
     // Метод для получения списка фильмов, которые лайкнул пользователь
@@ -57,7 +56,7 @@ public class LikesDbStorage implements LikesStorage {
         return jdbcTemplate.queryForList(sql, Long.class, userId);
     }
 
-    // Метод для получения списка фильмов с наибольшим количеством лайков
+/*    // Метод для получения списка фильмов с наибольшим количеством лайков
     @Override
     public List<Film> getPopularFilms(int count) {
         log.info("Отправляем запрос в БД для получения залайканых фильмов");
@@ -87,7 +86,34 @@ public class LikesDbStorage implements LikesStorage {
             film.setDirectors(directors);
         }
         return films;
+    }*/
+    @Override
+    public List<Film> getPopularFilms(int count) {
+        log.info("Отправляем запрос в БД для получения залайканых фильмов");
+        String sql = "SELECT f.*, " +
+            "m.rating_name AS mpa_rating_name, " +
+            "f.mpa_rating_id, " +
+            "g.genre_name, " +
+            "fg.genre_id, " +
+            "COUNT(l.film_id) AS like_count, " +
+            "GROUP_CONCAT(DISTINCT g.genre_name) AS genre_names, " +
+            "GROUP_CONCAT(DISTINCT d.director_name) AS director_names " +
+            "FROM FILMS f " +
+            "LEFT JOIN MPARating m ON f.mpa_rating_id = m.id " +
+            "LEFT JOIN FILM_GENRE fg ON f.id = fg.film_id " +
+            "LEFT JOIN GENRES g ON fg.genre_id = g.id " +
+            "LEFT JOIN FILM_DIRECTOR fd ON f.id = fd.film_id " +
+            "LEFT JOIN DIRECTORS d ON fd.director_id = d.id " +
+            "LEFT JOIN LIKES l ON f.id = l.film_id " +
+            "GROUP BY f.id, m.rating_name, m.id, g.genre_name, fg.genre_id " +
+            "ORDER BY like_count DESC " +
+            "LIMIT ?;";
+
+        List<Film> films = setGenresAndDirectorsForFilmsWithCount(sql,count);
+
+        return films;
     }
+
 
     private List<Genre> getGenresForFilm(Long filmId) {
         String genresSql = "SELECT g.* " +
@@ -100,6 +126,52 @@ public class LikesDbStorage implements LikesStorage {
             // Если жанров нет, возвращаем пустой список
             return Collections.emptyList();
         }
+    }
+
+    public List<Film> setGenresAndDirectorsForFilmsWithCount(String sql, Integer count) {
+        List<Film> films = jdbcTemplate.query(sql, (resultSet, i) -> {
+            Film film = LikesDbStorage.createFilmWithLikes(resultSet, i);
+            String genreNames = resultSet.getString("genre_names");
+            if (genreNames != null) {
+                List<Genre> genres = Arrays.stream(genreNames.split(","))
+                        .map(Genre::new)
+                        .collect(Collectors.toList());
+                film.setGenres(genres);
+            }
+            String directorNames = resultSet.getString("director_names");
+            if (directorNames != null) {
+                List<Director> directors = Arrays.stream(directorNames.split(","))
+                        .map(Director::new)
+                        .collect(Collectors.toList());
+                film.setDirectors(directors);
+            }
+            return film;
+        }, count);
+
+        return films;
+    }
+
+    public List<Film> setGenresAndDirectorsForFilmsWithoutCount(String sql) {
+        List<Film> films = jdbcTemplate.query(sql, (resultSet, i) -> {
+            Film film = LikesDbStorage.createFilmWithLikes(resultSet, i);
+            String genreNames = resultSet.getString("genre_names");
+            if (genreNames != null) {
+                List<Genre> genres = Arrays.stream(genreNames.split(","))
+                        .map(Genre::new)
+                        .collect(Collectors.toList());
+                film.setGenres(genres);
+            }
+            String directorNames = resultSet.getString("director_names");
+            if (directorNames != null) {
+                List<Director> directors = Arrays.stream(directorNames.split(","))
+                        .map(Director::new)
+                        .collect(Collectors.toList());
+                film.setDirectors(directors);
+            }
+            return film;
+        });
+
+        return films;
     }
 
     // Вспомогательный метод для создания объекта Genre из ResultSet
