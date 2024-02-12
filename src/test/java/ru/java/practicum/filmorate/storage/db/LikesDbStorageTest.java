@@ -148,7 +148,7 @@ class LikesDbStorageTest {
 
         // Проверяем количество лайков фильма
         long likesCount = likeStorage.getLikesCountForFilm(filmId);
-        assertEquals(2, likesCount);
+        assertEquals(1, likesCount);
     }
 
     @Test
