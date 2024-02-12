@@ -33,6 +33,4 @@ public class MpaController {
       log.info("Получаем рейтинг МРА по айди");
       return mpaRating;
     }
-
-
 }

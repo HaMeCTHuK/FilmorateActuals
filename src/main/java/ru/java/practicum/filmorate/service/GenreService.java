@@ -25,18 +25,21 @@ public class GenreService extends AbstractService<Genre> {
         return abstractStorage.get(id);
     }
 
+    //В данной реализации метод не используется
     @Override
     public void validate(Genre data) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Метод не используется");
     }
 
+    //В данной реализации метод не используется
     @Override
     public void validateParameter(Long id) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Метод не используется");
     }
 
+    //В данной реализации метод не используется
     @Override
     public void validateParameters(Long id, Long otherId) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Метод не используется");
     }
 }

@@ -71,6 +71,7 @@ public class UserDbStorage implements UserStorage {
     // Метод для удаления пользователя по его идентификатору
     @Override
     public void delete(Long id) {
+
         String sql = "DELETE FROM USERS WHERE id = ?";
         jdbcTemplate.update(sql, id);
         log.info("Удален объект с id= " + id);
@@ -102,5 +103,4 @@ public class UserDbStorage implements UserStorage {
     protected Object[] getParametersWithId(User user) {
         return new Object[]{user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId()};
     }
-
 }

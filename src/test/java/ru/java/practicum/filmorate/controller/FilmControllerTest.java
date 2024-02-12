@@ -47,7 +47,6 @@ class FilmControllerTest {
         Assertions.assertFalse(violations.isEmpty());
     }
 
-
     @Test
     public void testValidFilm() {
         Film film = Film.builder()

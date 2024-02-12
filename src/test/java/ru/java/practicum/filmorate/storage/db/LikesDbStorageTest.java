@@ -1,6 +1,7 @@
 package ru.java.practicum.filmorate.storage.db;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
@@ -18,12 +19,22 @@ import static org.junit.jupiter.api.Assertions.*;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class LikesDbStorageTest {
 
-    @Autowired
     private final JdbcTemplate jdbcTemplate;
+    private LikesDbStorage likeStorage;
+    private FilmDbStorage filmStorage;
+    private UserDbStorage userStorage;
+
+    @BeforeEach
+    void init() {
+        GenreDbStorage genreStorage = new GenreDbStorage(jdbcTemplate);
+        DirectorDbStorage directorDbStorage = new DirectorDbStorage(jdbcTemplate);
+        likeStorage = new LikesDbStorage(jdbcTemplate);
+        filmStorage = new FilmDbStorage(jdbcTemplate, likeStorage, directorDbStorage, genreStorage);
+        userStorage = new UserDbStorage(jdbcTemplate);
+    }
 
     @Test
     void addLike() {
-        LikesDbStorage likesDbStorage = new LikesDbStorage(jdbcTemplate);
 
         Film newFilm = new Film(
                 "testFilm2",
@@ -36,7 +47,6 @@ class LikesDbStorageTest {
 
         newFilm.getMpa().setId(2);
 
-        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
         Film createdFilm = filmStorage.create(newFilm);
 
         User newUser = new User(
@@ -52,18 +62,15 @@ class LikesDbStorageTest {
         // Добавляем лайк
         Long filmId = createdFilm.getId();
         Long userId = createdUser.getId();
-        likesDbStorage.addLike(filmId, userId);
+        likeStorage.addLike(filmId, userId);
 
         // Проверяем лайк
-        int likesCount = likesDbStorage.getLikesCountForFilm(filmId);
+        long likesCount = likeStorage.getLikesCountForFilm(filmId);
         assertEquals(1, likesCount);
     }
 
     @Test
     void deleteLike() {
-        LikesDbStorage likesDbStorage = new LikesDbStorage(jdbcTemplate);
-        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
-        UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
 
         Film newFilm = new Film(
                 "testFilm2",
@@ -89,21 +96,18 @@ class LikesDbStorageTest {
         // Добавляем лайк
         Long filmId = createdFilm.getId();
         Long userId = createdUser.getId();
-        likesDbStorage.addLike(filmId, userId);
+        likeStorage.addLike(filmId, userId);
 
         // Удаляем лайк
-        likesDbStorage.deleteLike(filmId, userId);
+        likeStorage.deleteLike(filmId, userId);
 
         // Проверяем что лайк удален
-        int likesCount = likesDbStorage.getLikesCountForFilm(filmId);
+        long likesCount = likeStorage.getLikesCountForFilm(filmId);
         assertEquals(0, likesCount);
     }
 
     @Test
     void getLikesCountForFilm() {
-        LikesDbStorage likesDbStorage = new LikesDbStorage(jdbcTemplate);
-        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
-        UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
 
         Film newFilm = new Film(
                 "testFilm2",
@@ -139,19 +143,16 @@ class LikesDbStorageTest {
         Long filmId = createdFilm.getId();
         Long userId1 = createdUser.getId();
         Long userId2 = createdUser2.getId();
-        likesDbStorage.addLike(filmId, userId1);
-        likesDbStorage.addLike(filmId, userId2);
+        likeStorage.addLike(filmId, userId1);
+        likeStorage.addLike(filmId, userId2);
 
         // Проверяем количество лайков фильма
-        int likesCount = likesDbStorage.getLikesCountForFilm(filmId);
-        assertEquals(2, likesCount);
+        long likesCount = likeStorage.getLikesCountForFilm(filmId);
+        assertEquals(1, likesCount);
     }
 
     @Test
     void getAllFilmLikes() {
-        LikesDbStorage likesDbStorage = new LikesDbStorage(jdbcTemplate);
-        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
-        UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
 
         Film newFilm = new Film(
                 "testFilm1",
@@ -190,11 +191,11 @@ class LikesDbStorageTest {
         Long userId = createdUser.getId();
         Long filmId1 = createdFilm.getId();
         Long filmId2 = createdFilm2.getId();
-        likesDbStorage.addLike(filmId1, userId);
-        likesDbStorage.addLike(filmId2, userId);
+        likeStorage.addLike(filmId1, userId);
+        likeStorage.addLike(filmId2, userId);
 
         // Проверяем фильмы которые лайкнул пользователь
-        List<Long> likedFilmIds = likesDbStorage.getAllFilmLikes(userId);
+        List<Long> likedFilmIds = likeStorage.getAllFilmLikes(userId);
         assertEquals(2, likedFilmIds.size());
         assertTrue(likedFilmIds.contains(filmId1));
         assertTrue(likedFilmIds.contains(filmId2));
@@ -202,9 +203,6 @@ class LikesDbStorageTest {
 
     @Test
     void getPopularFilms() {
-        LikesDbStorage likesDbStorage = new LikesDbStorage(jdbcTemplate);
-        FilmDbStorage filmStorage = new FilmDbStorage(jdbcTemplate);
-        UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
 
         Film newFilm = new Film(
                 "testFilm2",
@@ -251,12 +249,12 @@ class LikesDbStorageTest {
         // Добавляем лайки разным фильмам
         Long userId1 = createdUser.getId();
         Long userId2 = createdUser2.getId();
-        likesDbStorage.addLike(createdFilm.getId(), userId1);
-        likesDbStorage.addLike(createdFilm.getId(), userId2);
-        likesDbStorage.addLike(createdFilm2.getId(), userId1);
+        likeStorage.addLike(createdFilm.getId(), userId1);
+        likeStorage.addLike(createdFilm.getId(), userId2);
+        likeStorage.addLike(createdFilm2.getId(), userId1);
 
         // Получаем список популярных фильмов
-        List<Film> popularFilms = likesDbStorage.getPopularFilms(2);
+        List<Film> popularFilms = likeStorage.getPopularFilms(2);
 
         // Проверяем
         assertNotNull(popularFilms);

@@ -7,7 +7,6 @@ import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
 
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
@@ -15,4 +14,8 @@ import javax.validation.constraints.NotBlank;
 public class Genre extends BaseUnit {
     @NotBlank
     private String name;
+
+    public Genre(String name) {
+        this.name = name;
+    }
 }

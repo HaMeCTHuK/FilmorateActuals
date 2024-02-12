@@ -11,8 +11,13 @@ import javax.validation.constraints.NotBlank;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class Mpa extends BaseUnit {
+public class Director extends BaseUnit {
+
     @NotBlank
     private String name;
+
+    public Director(String name) {
+        this.name = name;
+    }
 
 }
