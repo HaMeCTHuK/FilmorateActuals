@@ -26,9 +26,19 @@ public class LikesDbStorage implements LikesStorage {
     // Метод для добавления лайка фильма от конкретного пользователя
     @Override
     public void addLike(Long filmId, Long userId) {
+        String sqlCheck = "SELECT COUNT(*) FROM LIKES WHERE film_id = ? AND user_id = ?";
+        int count = jdbcTemplate.queryForObject(sqlCheck, Integer.class, filmId, userId);
+
+        if (count > 0) {
+            // Пользователь уже поставил лайк, возвращаем 200 и ничего не делаем
+            return;
+        }
+
+        // Если пользователь еще не поставил лайк, можно добавить его
         String sql = "INSERT INTO LIKES (film_id, user_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, filmId, userId);
     }
+
 
     // Метод для удаления лайка фильма от конкретного пользователя
     @Override
